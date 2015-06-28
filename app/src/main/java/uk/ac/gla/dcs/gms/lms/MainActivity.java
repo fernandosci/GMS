@@ -1,4 +1,4 @@
-package uk.ac.gla.dcs.gms.gms;
+package uk.ac.gla.dcs.gms.lms;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
