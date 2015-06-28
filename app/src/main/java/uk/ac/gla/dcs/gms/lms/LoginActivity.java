@@ -37,7 +37,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                 ((EditText)findViewById(R.id.login_edittxt_email)).setText(email);
             }
             else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(getApplicationContext(), "RegisterActivity Canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Register Canceled", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -50,7 +50,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             startActivityForResult(intent, REGISTER);
         }
         else if (v.getId() == R.id.login_btn || v.getId() == R.id.feedback_back) {
-            //startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
 
             /*setContentView(R.layout.daily_summary);
 
