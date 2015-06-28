@@ -10,35 +10,25 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="LMS"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
     <ImageView
-        android:id="@+id/logo"
+        android:id="@+id/login_iview_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp" />
 
     <TextView
-        android:id="@+id/description"
+        android:id="@+id/login_iview_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/logo"
+        android:layout_below="@+id/login_iview_logo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
-        android:text="Medium Text"
+        android:text="@string/login_str_description"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/login_edittxt_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -48,39 +38,39 @@
         android:hint="Login" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/login_edittxt_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/editText"
+        android:layout_alignEnd="@+id/login_edittxt_email"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/editText"
+        android:layout_below="@+id/login_edittxt_email"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/login_button"
+        android:id="@+id/login_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/register_button"
+        android:layout_above="@+id/login_btn_register"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/forgot_pw_button"
+        android:layout_toStartOf="@+id/login_btn_forgot_password"
         android:text="Login" />
 
     <Button
-        android:id="@+id/forgot_pw_button"
+        android:id="@+id/login_btn_forgot_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/editText2"
-        android:layout_alignStart="@+id/logo"
-        android:layout_alignTop="@+id/login_button"
+        android:layout_alignEnd="@+id/login_edittxt_password"
+        android:layout_alignStart="@+id/login_iview_logo"
+        android:layout_alignTop="@+id/login_btn"
         android:text="Forgot Password" />
 
     <Button
-        android:id="@+id/register_button"
+        android:id="@+id/login_btn_register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/forgot_pw_button"
+        android:layout_alignEnd="@+id/login_btn_forgot_password"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:text="Register" />

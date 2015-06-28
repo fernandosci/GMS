@@ -150,7 +150,7 @@
         android:text="@string/feedback_str_question4"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-     <RadioGroup
+    <RadioGroup
         android:id="@+id/feedback_rgrp_question4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -224,5 +224,21 @@
             android:text="@string/feedback_str_no" />
 
     </RadioGroup>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:id="@+id/feedback_back"
+        android:layout_above="@+id/feedback_button"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:id="@+id/feedback_next"
+        android:layout_above="@+id/feedback_button"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>
