@@ -4,6 +4,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             setContentView(R.layout.daily_summary);
 
             findViewById(R.id.back).setOnClickListener(this);
+            findViewById(R.id.next).setOnClickListener(this);
 
             ((ImageView)findViewById(R.id.imageView1)).setImageResource(R.drawable.bonus_coin);
             ((ImageView)findViewById(R.id.imageView2)).setImageResource(R.drawable.bonus_coin);
@@ -40,6 +42,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             ((ImageView)findViewById(R.id.imageView4)).setImageResource(R.drawable.bonus_coin);
             ((ImageView)findViewById(R.id.imageView5)).setImageResource(R.drawable.bonus_coin);
             ((ImageView)findViewById(R.id.imageView6)).setImageResource(R.drawable.bonus_coin);
+        }
+        else if (v.getId() == R.id.next) {
+            setContentView(R.layout.feedback);
+
+            findViewById(R.id.feedback_button).setOnClickListener(this);
+        }
+        else if (v.getId() == R.id.feedback_button) {
+            displayOption(R.id.feedback_rgrp_question1);
+            displayOption(R.id.feedback_rgrp_question2);
+            displayOption(R.id.feedback_rgrp_question3);
+            displayOption(R.id.feedback_rgrp_question4);
+            displayOption(R.id.feedback_rgrp_question5);
         }
     }
 
@@ -51,6 +65,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         findViewById(R.id.register_button).setOnClickListener(this);
         findViewById(R.id.login_button).setOnClickListener(this);
+    }
+
+    private void displayOption(int group) {
+        RadioGroup radioGroup = (RadioGroup) findViewById(group);
+        int radioButtonID = radioGroup.getCheckedRadioButtonId();
+        View radioButton = radioGroup.findViewById(radioButtonID);
+        Integer idx = radioGroup.indexOfChild(radioButton);
+        Toast.makeText(getApplicationContext(), idx.toString(), Toast.LENGTH_SHORT).show();
     }
 }
 
