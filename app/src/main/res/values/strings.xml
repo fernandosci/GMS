@@ -2,8 +2,8 @@
     <string name="app_name">GMS</string>
 
     <string name="feedback_str_yes">Yes</string>
-    <string name="feedback_str_Maybe">Maybe</string>
-    <string name="feedback_str_No">No</string>
+    <string name="feedback_str_maybe">Maybe</string>
+    <string name="feedback_str_no">No</string>
 
     <string name="feedback_str_question1">Question 1</string>
     <string name="feedback_str_question2">Question 2</string>
