@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/feedback_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:text="Submit Feedback" />
+
+    <TextView
+        android:id="@+id/feedback_textview_question1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:text="@string/feedback_str_question1"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <RadioGroup
+        android:id="@+id/feedback_rgrp_question1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_textview_question1"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/feedback_str_yes" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="75dp"
+            android:text="@string/feedback_str_maybe" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="85dp"
+            android:text="@string/feedback_str_no" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/feedback_textview_question2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_rgrp_question1"
+        android:layout_centerHorizontal="true"
+        android:text="@string/feedback_str_question2"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <RadioGroup
+        android:id="@+id/feedback_rgrp_question2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_textview_question2"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/feedback_str_yes" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="75dp"
+            android:text="@string/feedback_str_maybe" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="85dp"
+            android:text="@string/feedback_str_no" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/feedback_textview_question3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_rgrp_question2"
+        android:layout_centerHorizontal="true"
+        android:text="@string/feedback_str_question3"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <RadioGroup
+        android:id="@+id/feedback_rgrp_question3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_textview_question3"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/feedback_str_yes" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="75dp"
+            android:text="@string/feedback_str_maybe" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="85dp"
+            android:text="@string/feedback_str_no" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/feedback_textview_question4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_rgrp_question3"
+        android:layout_centerHorizontal="true"
+        android:text="@string/feedback_str_question4"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+     <RadioGroup
+        android:id="@+id/feedback_rgrp_question4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_textview_question4"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/feedback_str_yes" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="75dp"
+            android:text="@string/feedback_str_maybe" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="85dp"
+            android:text="@string/feedback_str_no" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/feedback_textview_question5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_rgrp_question4"
+        android:layout_centerHorizontal="true"
+        android:text="@string/feedback_str_question5"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <RadioGroup
+        android:id="@+id/feedback_rgrp_question5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback_textview_question5"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/feedback_str_yes" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="75dp"
+            android:text="@string/feedback_str_maybe" />
+
+        <RadioButton
+            android:id="@+id/feedback_radioButton15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="85dp"
+            android:text="@string/feedback_str_no" />
+
+    </RadioGroup>
+
+</RelativeLayout>

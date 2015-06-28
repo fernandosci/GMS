@@ -2,37 +2,56 @@ package uk.ac.gla.dcs.gms.lms;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        loginScreen();
+
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void onClick(View v) {
+        if (v.getId() == R.id.register_button) {
+            setContentView(R.layout.register_screen);
+            findViewById(R.id.cancel).setOnClickListener(this);
+        }
+        else if (v.getId() == R.id.cancel || v.getId() == R.id.back) {
+            setContentView(R.layout.activity_main);
+            loginScreen();
+        }
+        else if (v.getId() == R.id.login_button) {
+            setContentView(R.layout.daily_summary);
+
+            findViewById(R.id.back).setOnClickListener(this);
+
+            /*((ImageView)findViewById(R.id.imageView1)).setImageResource(R.drawable.bonus_coin);
+            ((ImageView)findViewById(R.id.imageView2)).setImageResource(R.drawable.bonus_coin);
+            ((ImageView)findViewById(R.id.imageView3)).setImageResource(R.drawable.bonus_coin);
+            ((ImageView)findViewById(R.id.imageView4)).setImageResource(R.drawable.bonus_coin);
+            ((ImageView)findViewById(R.id.imageView5)).setImageResource(R.drawable.bonus_coin);
+            ((ImageView)findViewById(R.id.imageView6)).setImageResource(R.drawable.bonus_coin);*/
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    private void loginScreen() {
+        //((ImageView)findViewById(R.id.logo)).setImageResource(R.drawable.bonus_coin);
 
-        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
+        TextView textView = (TextView)(findViewById(R.id.description));
+        textView.setText("Description Description Description...");
 
-        return super.onOptionsItemSelected(item);
+        findViewById(R.id.register_button).setOnClickListener(this);
+        findViewById(R.id.login_button).setOnClickListener(this);
     }
 }
+

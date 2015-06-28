@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">GMS</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="feedback_str_yes">Yes</string>
+    <string name="feedback_str_Maybe">Maybe</string>
+    <string name="feedback_str_No">No</string>
+
+    <string name="feedback_str_question1">Question 1</string>
+    <string name="feedback_str_question2">Question 2</string>
+    <string name="feedback_str_question3">Question 3</string>
+    <string name="feedback_str_question4">Question 4</string>
+    <string name="feedback_str_question5">Question 5</string>
 </resources>
