@@ -9,6 +9,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import uk.ac.gla.dcs.gms.api.APIHandler;
+import uk.ac.gla.dcs.gms.api.APIResponse;
+import uk.ac.gla.dcs.gms.api.LMSLoginRequest;
+
 @SuppressWarnings("deprecation")
 public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -49,6 +53,29 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             startActivityForResult(intent, REGISTER);
         }
         else if (v.getId() == R.id.login_btn) {
+
+
+            LMSLoginRequest request = new LMSLoginRequest(getApplicationContext()) {
+                @Override
+                protected void onPostExecute(APIResponse s) {
+
+                    Toast toast = Toast.makeText(getApplicationContext(), s.getResponse(), Toast.LENGTH_SHORT);
+                    toast.show();
+
+                    if (s.isFailed()){
+
+                        return;
+                    }
+                    else{
+                        if (false){
+                            return;
+                        }
+                       //success
+                    }
+                }
+            };
+            APIHandler.login(request, "zivile", "password");
+
             startActivity(new Intent(this, MainActivity.class));
         }
     }

@@ -25,36 +25,46 @@ import uk.ac.gla.dcs.gms.lms.R;
 public abstract class APICall extends AsyncTask<String, Integer, String>{
 
     private static final String TAG = "APICall";
-    private Context context;
+    private Exception exception;
+    private boolean succeed;
 
-    public APICall(Context context){
-        this.context = context;
+    public APICall(){
+        exception = null;
+        succeed = true;
     }
 
     @Override
     protected String doInBackground(String... params) {
-        String urlString=params[0];
+        String baseUrl=params[0];
+        String urlString=params[1];
         String resultToDisplay;
         InputStream in = null;
 
         // HTTP Get
         try {
-            String baseUrl = context.getResources().getString(R.string.gmsrest_url);
-            URL url = new URL( baseUrl+"/"+urlString );
+            URL url = new URL( baseUrl + "/" + urlString );
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream(urlConnection.getInputStream());
-
-            InputStreamReader isr = new InputStreamReader(in);
 
             String jsonString = IOUtils.toString(in, "UTF-8");
 
             Log.v(TAG, jsonString);
+
+            return jsonString;
             
         } catch (Exception e ) {
-            System.out.println(e.getMessage());
-            return e.getMessage();
+            exception = e;
+            succeed = false;
+            Log.e(TAG, e.getMessage());
+            return null;
         }
+    }
 
-        return null;
+    public Exception getException() {
+        return exception;
+    }
+
+    public boolean isSucceed() {
+        return succeed;
     }
 }

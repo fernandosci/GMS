@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import uk.ac.gla.dcs.gms.api.APIResponse;
+import uk.ac.gla.dcs.gms.api.LMSRegisterRequest;
+
 @SuppressWarnings("deprecation")
 public class RegisterActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -42,6 +45,16 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
 
             if (password1.equals(password2)) { //make other password tests
                 //send details to server
+                LMSRegisterRequest request = new LMSRegisterRequest(getApplicationContext()) {
+                    @Override
+                    protected void onPostExecute(APIResponse apiResponse) {
+                        Toast toast = Toast.makeText(getApplicationContext(), apiResponse.getResponse(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                };
+
+                request.execute(getResources().getString(R.string.username),getResources().getString(R.string.password),"email","answer","question");//(username + ":" + password + ":" + email + ":" + answer + ":" + question)
+
                 // if success return to login screen with email
 
                 Bundle bundle = new Bundle();

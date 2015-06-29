@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="gmsrest_url">gmsrest.dcs.gla.ac.uk</string>
+    <string name="gmsrest_httpUrl">http://gmsrest.dcs.gla.ac.uk</string>
+    <string name="lms_httpUrl">http://mirtest.dcs.gla.ac.uk</string>
+
+    <string name="lms_httpUrlLogin">/api/auth/local/login</string>
+    <string name="lms_httpUrlRegister">/api/auth/local/register</string>
+
+    <string name="lms_httpUrlGetImage">/api/images/get</string>
+
+
+
+
+    <string name="username">debug</string>
+    <string name="password">abcdABCD1234!@#$</string>
+
+
 
 </resources>
