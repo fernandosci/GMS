@@ -17,9 +17,12 @@
 
     <string name="title_activity_main">MainActivity</string>
 
-    <string name="title_section1">Section Ito</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_daily_summary">Daily Summary</string>
+    <string name="title_recently_upload">Recently Uploaded Images</string>
+    <string name="title_heat_map">Heat Map</string>
+    <string name="title_hot_spots">Hot Spots</string>
+    <string name="title_around_you">Around You</string>
+    <string name="title_feedback">Feedback</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

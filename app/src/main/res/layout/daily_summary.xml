@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/daily_summary_iview_img1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -15,25 +15,25 @@
         android:layout_marginTop="55dp" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/daily_summary_iview_img2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/imageView1"
+        android:layout_below="@+id/daily_summary_iview_img1"
         android:layout_marginStart="50dp"
         android:layout_marginTop="60dp" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/daily_summary_iview_img3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/imageView2"
+        android:layout_below="@+id/daily_summary_iview_img2"
         android:layout_marginStart="50dp"
         android:layout_marginTop="60dp" />
 
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/daily_summary_iview_img4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -42,20 +42,20 @@
         android:layout_marginTop="55dp" />
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/daily_summary_iview_img5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/imageView4"
+        android:layout_below="@+id/daily_summary_iview_img4"
         android:layout_marginEnd="50dp"
         android:layout_marginTop="60dp" />
 
     <ImageView
-        android:id="@+id/imageView6"
+        android:id="@+id/daily_summary_iview_img6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/imageView5"
+        android:layout_below="@+id/daily_summary_iview_img5"
         android:layout_marginEnd="50dp"
         android:layout_marginTop="60dp" />
 
@@ -66,21 +66,5 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:text="Date Picker" />
-
-    <Button
-        android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/date_picker"
-        android:layout_alignParentStart="true"
-        android:text="Back" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next"
-        android:id="@+id/next"
-        android:layout_alignBottom="@+id/back"
-        android:layout_alignParentRight="true" />
 
 </RelativeLayout>

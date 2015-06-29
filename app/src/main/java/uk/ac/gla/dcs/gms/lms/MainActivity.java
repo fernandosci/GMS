@@ -5,22 +5,17 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.ImageView;
 
-import uk.ac.gla.dcs.gms.lms.R;
-
+@SuppressWarnings("deprecation")
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -61,13 +56,22 @@ public class MainActivity extends ActionBarActivity
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.title_daily_summary);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
+                mTitle = getString(R.string.title_recently_upload);
                 break;
             case 3:
-                mTitle = getString(R.string.title_section3);
+                mTitle = getString(R.string.title_heat_map);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_hot_spots);
+                break;
+            case 5:
+                mTitle = getString(R.string.title_around_you);
+                break;
+            case 6:
+                mTitle = getString(R.string.title_feedback);
                 break;
         }
     }
@@ -136,7 +140,41 @@ public class MainActivity extends ActionBarActivity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            Bundle bundle = getArguments();
+            int sectionNumber = bundle.getInt(ARG_SECTION_NUMBER);
+
+            View rootView;
+            Log.v("new", Integer.toString(sectionNumber));
+
+            if (sectionNumber == 1) {
+                rootView = inflater.inflate(R.layout.daily_summary, container, false);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img1)).setImageResource(R.drawable.bonus_coin);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img2)).setImageResource(R.drawable.bonus_coin);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img3)).setImageResource(R.drawable.bonus_coin);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img4)).setImageResource(R.drawable.bonus_coin);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img5)).setImageResource(R.drawable.bonus_coin);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img6)).setImageResource(R.drawable.bonus_coin);
+            }
+            else if (sectionNumber == 2) {
+                rootView = inflater.inflate(R.layout.daily_summary, container, false);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img1)).setImageResource(R.drawable.bonus_tree);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img2)).setImageResource(R.drawable.bonus_tree);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img3)).setImageResource(R.drawable.bonus_tree);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img4)).setImageResource(R.drawable.bonus_tree);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img5)).setImageResource(R.drawable.bonus_tree);
+                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img6)).setImageResource(R.drawable.bonus_tree);
+            }
+            else if (sectionNumber == 3) {
+                rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            }
+            else if (sectionNumber == 4) {
+                rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            }
+            else if (sectionNumber == 5) {
+                rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            }
+            else
+                rootView = inflater.inflate(R.layout.feedback, container, false);
             return rootView;
         }
 

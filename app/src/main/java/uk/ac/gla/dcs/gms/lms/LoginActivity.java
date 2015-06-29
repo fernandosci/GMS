@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
@@ -49,56 +48,9 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             Intent intent = new Intent(this, RegisterActivity.class);
             startActivityForResult(intent, REGISTER);
         }
-        else if (v.getId() == R.id.login_btn || v.getId() == R.id.feedback_back) {
+        else if (v.getId() == R.id.login_btn) {
             startActivity(new Intent(this, MainActivity.class));
-
-            /*setContentView(R.layout.daily_summary);
-
-            findViewById(R.id.back).setOnClickListener(this);
-            findViewById(R.id.next).setOnClickListener(this);
-
-            ((ImageView)findViewById(R.id.imageView1)).setImageResource(R.drawable.bonus_coin);
-            ((ImageView)findViewById(R.id.imageView2)).setImageResource(R.drawable.bonus_coin);
-            ((ImageView)findViewById(R.id.imageView3)).setImageResource(R.drawable.bonus_coin);
-            ((ImageView)findViewById(R.id.imageView4)).setImageResource(R.drawable.bonus_coin);
-            ((ImageView)findViewById(R.id.imageView5)).setImageResource(R.drawable.bonus_coin);
-            ((ImageView)findViewById(R.id.imageView6)).setImageResource(R.drawable.bonus_coin);*/
         }
-        /*else if (v.getId() == R.id.next || v.getId() == R.id.single_image_btn_back) {
-            setContentView(R.layout.feedback);
-
-            findViewById(R.id.feedback_button).setOnClickListener(this);
-            findViewById(R.id.feedback_back).setOnClickListener(this);
-            findViewById(R.id.feedback_next).setOnClickListener(this);
-        }
-        else if (v.getId() == R.id.feedback_next) {
-            setContentView(R.layout.single_image);
-
-            ((ImageView)findViewById(R.id.singleview_iview)).setImageResource(R.drawable.bonus_coin);
-
-            findViewById(R.id.single_image_btn_back).setOnClickListener(this);
-            findViewById(R.id.single_image_btn_next).setOnClickListener(this);
-
-            findViewById(R.id.single_image_tview_tags).setVisibility(View.INVISIBLE);
-        }
-        else if (v.getId() == R.id.single_image_btn_next) {
-            startActivity(new Intent(this, MapsActivity.class));
-        }
-        else if (v.getId() == R.id.feedback_button) {
-            displayOption(R.id.feedback_rgrp_question1);
-            displayOption(R.id.feedback_rgrp_question2);
-            displayOption(R.id.feedback_rgrp_question3);
-            displayOption(R.id.feedback_rgrp_question4);
-            displayOption(R.id.feedback_rgrp_question5);
-        }*/
-    }
-
-    private void displayOption(int group) {
-        RadioGroup radioGroup = (RadioGroup) findViewById(group);
-        int radioButtonID = radioGroup.getCheckedRadioButtonId();
-        View radioButton = radioGroup.findViewById(radioButtonID);
-        Integer idx = radioGroup.indexOfChild(radioButton);
-        Toast.makeText(getApplicationContext(), idx.toString(), Toast.LENGTH_SHORT).show();
     }
 }
 

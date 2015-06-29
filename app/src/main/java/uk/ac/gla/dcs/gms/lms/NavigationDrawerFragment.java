@@ -27,6 +27,8 @@ import android.widget.Toast;
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
+
+@SuppressWarnings("deprecation")
 public class NavigationDrawerFragment extends Fragment {
 
     /**
@@ -102,9 +104,12 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
+                        getString(R.string.title_daily_summary),
+                        getString(R.string.title_recently_upload),
+                        getString(R.string.title_heat_map),
+                        getString(R.string.title_hot_spots),
+                        getString(R.string.title_around_you),
+                        getString(R.string.title_feedback),
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
@@ -234,10 +239,10 @@ public class NavigationDrawerFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // If the drawer is open, show the global app actions in the action bar. See also
         // showGlobalContextActionBar, which controls the top-left area of the action bar.
-        if (mDrawerLayout != null && isDrawerOpen()) {
+        //if (mDrawerLayout != null && isDrawerOpen()) {
             //inflater.inflate(R.menu.global, menu);
             //showGlobalContextActionBar();
-        }
+        //}
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -273,7 +278,7 @@ public class NavigationDrawerFragment extends Fragment {
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */
-    public static interface NavigationDrawerCallbacks {
+    public interface NavigationDrawerCallbacks {
         /**
          * Called when an item in the navigation drawer is selected.
          */
