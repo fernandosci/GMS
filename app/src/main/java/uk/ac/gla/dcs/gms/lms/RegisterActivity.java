@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+@SuppressWarnings("deprecation")
 public class RegisterActivity extends ActionBarActivity implements View.OnClickListener {
 
     final static String EMAIL = "RegisterActivity.email";
