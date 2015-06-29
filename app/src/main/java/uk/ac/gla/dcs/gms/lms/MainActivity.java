@@ -15,6 +15,16 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ImageView;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Map;
+
 @SuppressWarnings("deprecation")
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -29,6 +39,8 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
+    public static FragmentManager fragmentManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,12 +54,23 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        fragmentManager = getSupportFragmentManager();
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if (position == 2) {
+            uk.ac.gla.dcs.gms.lms.MapFragment mapFragment = new uk.ac.gla.dcs.gms.lms.MapFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, mapFragment)
+                    .commit();
+            return;
+        }
+
         fragmentManager.beginTransaction()
                 .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
                 .commit();
@@ -165,7 +188,7 @@ public class MainActivity extends ActionBarActivity
                 ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img6)).setImageResource(R.drawable.bonus_tree);
             }
             else if (sectionNumber == 3) {
-                rootView = inflater.inflate(R.layout.fragment_main, container, false);
+                rootView = inflater.inflate(R.layout.maps, container, false);
             }
             else if (sectionNumber == 4) {
                 rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -181,9 +204,8 @@ public class MainActivity extends ActionBarActivity
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+            ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+
         }
     }
-
 }
