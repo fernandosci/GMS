@@ -44,10 +44,8 @@ public abstract class LMSLoginRequest extends AsyncTask<String, Integer, APIResp
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
             urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-            //urlConnection.connect();
 
             InputStream in = urlConnection.getInputStream();
-
 
             response = new APIResponse(IOUtils.toString(in, "UTF-8"),urlConnection.getHeaderFields(),false,null);
         } catch (Exception e) {

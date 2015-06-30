@@ -3,8 +3,10 @@ package uk.ac.gla.dcs.gms.api;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -43,12 +45,10 @@ public abstract class LMSRegisterRequest extends AsyncTask<String, Integer, APIR
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
             urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-            //urlConnection.connect();
 
             InputStream in = urlConnection.getInputStream();
-
-
             response = new APIResponse(IOUtils.toString(in, "UTF-8"),urlConnection.getHeaderFields(),false,null);
+
         } catch (Exception e) {
             e.printStackTrace();
             response = new APIResponse(null,null,true,e);

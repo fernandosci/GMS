@@ -1,5 +1,10 @@
 package uk.ac.gla.dcs.gms.api;
 
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,18 +13,28 @@ import java.util.Map;
  */
 public class APIResponse {
 
-    private String response;
+    private static final String TAG = "APIResponse";
+
+    private String rawResponse;
     private Map<String, List<String>> headerFields;
     private Exception exception;
     private boolean failed;
+    private JSONObject jsonObject;
 
     public APIResponse(String response, Map<String, List<String>> headerFields, boolean failed, Exception exception) {
-        this.response = response;
+        this.rawResponse = response;
         this.headerFields = headerFields;
+        jsonObject = null;
+        try {
+            jsonObject = new JSONObject(this.rawResponse);
+        } catch (JSONException e) {
+            Log.e(TAG,e.toString());
+            e.printStackTrace();
+        }
     }
 
-    public String getResponse() {
-        return response;
+    public String getRawResponse() {
+        return rawResponse;
     }
 
     public Map<String, List<String>> getHeaderFields() {
@@ -32,5 +47,9 @@ public class APIResponse {
 
     public Exception getException() {
         return exception;
+    }
+
+    public JSONObject getJsonObject() {
+        return jsonObject;
     }
 }
