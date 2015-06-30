@@ -8,14 +8,11 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.gcm.Task;
-
+import uk.ac.gla.dcs.gms.Utils;
 import uk.ac.gla.dcs.gms.api.APIResponse;
 import uk.ac.gla.dcs.gms.api.LMSRegisterRequest;
 
@@ -70,8 +67,7 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                 LMSRegisterRequest request = new LMSRegisterRequest(getApplicationContext()) {
                     @Override
                     protected void onPostExecute(APIResponse apiResponse) {
-                        Toast toast = Toast.makeText(getApplicationContext(), apiResponse.getResponse(), Toast.LENGTH_SHORT);
-                        toast.show();
+                        Utils.shortToast(getApplicationContext(), apiResponse.getRawResponse());
                     }
                 };
 
@@ -89,7 +85,7 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                 finish();
             }
             else {
-                Toast.makeText(getApplicationContext(), "Passwords must match", Toast.LENGTH_LONG).show();
+                Utils.longToast(getApplicationContext(), "Passwords must match");
             }
 
         }
