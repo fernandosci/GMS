@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="gmsrest_httpUrl">http://gmsrest.dcs.gla.ac.uk</string>
-    <string name="lms_httpUrl">http://192.168.0.8</string>
+    <string name="lms_httpUrl">http://192.168.30.128</string>
 
     <string name="lms_httpUrlLogin">/api/auth/local/login</string>
     <string name="lms_httpUrlRegister">/api/auth/local/register</string>

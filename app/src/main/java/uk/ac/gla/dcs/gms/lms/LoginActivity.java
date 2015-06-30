@@ -2,8 +2,8 @@ package uk.ac.gla.dcs.gms.lms;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import uk.ac.gla.dcs.gms.api.APIHandler;
 import uk.ac.gla.dcs.gms.api.APIResponse;
@@ -61,7 +60,6 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         }
         else if (v.getId() == R.id.login_btn) {
 
-
             LMSLoginRequest request = new LMSLoginRequest(getApplicationContext()) {
                 @Override
                 protected void onPostExecute(APIResponse s) {
@@ -69,9 +67,8 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                     String errorField = getResources().getString(R.string.error_field_errors);
 
                     //check if had an exception
-                    if (s.isFailed()){
-                        Toast toast = Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_messages_genericNetworkFail), Toast.LENGTH_SHORT);
-                        toast.show();
+                    if (s.isFailed() || s.getJsonObject() == null){
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_messages_genericNetworkFail), Toast.LENGTH_SHORT).show();
                     }
                     else{
                         //check if server returned error message
@@ -84,18 +81,15 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                                     JSONArray jArray = (JSONArray)errorMsg;
 
                                     if (jArray.length() > 0) {
-                                        Toast toast = Toast.makeText(getApplicationContext(), jArray.getString(0), Toast.LENGTH_SHORT);
-                                        toast.show();
+                                        Toast.makeText(getApplicationContext(), jArray.getString(0), Toast.LENGTH_SHORT).show();
                                         return;
                                     }
                                 }
                                 // if dont have error message, display raw message
-                                Toast toast = Toast.makeText(getApplicationContext(), s.getRawResponse(), Toast.LENGTH_SHORT);
-                                toast.show();
+                                Toast.makeText(getApplicationContext(), s.getRawResponse(), Toast.LENGTH_SHORT).show();
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                Toast toast = Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_messages_genericNetworkFail), Toast.LENGTH_SHORT);
-                                toast.show();
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_messages_genericNetworkFail), Toast.LENGTH_SHORT).show();
                             }
                         }else if (s.getJsonObject().has(dataField)){
                             //success
@@ -106,6 +100,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                                 {
                                     String token = (String)dataMessage;
                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    return;
                                 }
                                 //failed to receive data
                                 Log.e(TAG, "Failed to receive data");
@@ -117,6 +112,9 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                             }
                         }
                     }
+
+                    //login anyway
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }
             };
             APIHandler.login(request, getResources().getString(R.string.username), getResources().getString(R.string.password));

@@ -24,12 +24,15 @@ public class APIResponse {
     public APIResponse(String response, Map<String, List<String>> headerFields, boolean failed, Exception exception) {
         this.rawResponse = response;
         this.headerFields = headerFields;
+        this.failed = failed;
         jsonObject = null;
-        try {
-            jsonObject = new JSONObject(this.rawResponse);
-        } catch (JSONException e) {
-            Log.e(TAG,e.toString());
-            e.printStackTrace();
+        if (!failed) {
+            try {
+                jsonObject = new JSONObject(this.rawResponse);
+            } catch (JSONException e) {
+                Log.e(TAG, e.toString());
+                e.printStackTrace();
+            }
         }
     }
 

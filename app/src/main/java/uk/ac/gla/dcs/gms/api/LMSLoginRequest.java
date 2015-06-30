@@ -3,17 +3,12 @@ package uk.ac.gla.dcs.gms.api;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Base64;
-import android.util.Log;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 import uk.ac.gla.dcs.gms.lms.R;
 
@@ -44,6 +39,7 @@ public abstract class LMSLoginRequest extends AsyncTask<String, Integer, APIResp
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
             urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            urlConnection.setConnectTimeout(2000);
 
             InputStream in = urlConnection.getInputStream();
 
