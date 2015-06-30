@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,6 +22,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/register_edittxt_email"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="First Name"
         android:inputType="textPersonName" />
@@ -34,9 +34,32 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/register_edittxt_first_name"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Last Name"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:imeOptions="actionNext"/>
+
+    <TextView
+        android:id="@+id/register_tview_secret_question"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/register_edittxt_last_name"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="@string/register_str_secret_question"
+        android:textSize="20dp" />
+
+    <EditText
+        android:id="@+id/register_edittxt_answer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/register_tview_secret_question"
+        android:layout_marginTop="10dp"
+        android:hint="Answer"
+        android:inputType="text" />
 
     <EditText
         android:id="@+id/register_edittxt_password"
@@ -44,7 +67,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/register_edittxt_last_name"
+        android:layout_below="@+id/register_edittxt_answer"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword" />
@@ -56,6 +80,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/register_edittxt_password"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Confirm Password"
         android:inputType="textPassword" />
@@ -64,10 +89,10 @@
         android:id="@+id/register_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
         android:layout_marginEnd="100dp"
-        android:layout_marginTop="100dp"
-        android:text="Register"
-        android:layout_below="@+id/register_edittxt_confirm_password"
-        android:layout_centerHorizontal="true" />
+        android:text="Register" />
 
 </RelativeLayout>

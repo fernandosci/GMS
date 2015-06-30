@@ -1,12 +1,20 @@
 package uk.ac.gla.dcs.gms.lms;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.gcm.Task;
 
 import uk.ac.gla.dcs.gms.api.APIResponse;
 import uk.ac.gla.dcs.gms.api.LMSRegisterRequest;
@@ -25,6 +33,20 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
         setContentView(R.layout.register);
 
         findViewById(R.id.register_btn).setOnClickListener(this);
+        findViewById(R.id.register_tview_secret_question).setOnClickListener(this);
+
+        ((EditText)findViewById(R.id.register_edittxt_last_name)).setOnEditorActionListener(
+                new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                            findViewById(R.id.register_tview_secret_question).performClick();
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+        );
     }
 
     @Override
@@ -70,6 +92,22 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                 Toast.makeText(getApplicationContext(), "Passwords must match", Toast.LENGTH_LONG).show();
             }
 
+        }
+        else if (v.getId() == R.id.register_tview_secret_question) {
+            final String [] questions = new String[2];
+            questions[0] = "Question 1?";
+            questions[1] = "Question 2?";
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.register_str_secret_question);
+            builder.setItems(questions, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ((TextView)findViewById(R.id.register_tview_secret_question)).setText(questions[which]);
+                    findViewById(R.id.register_edittxt_answer).requestFocus();
+                }
+            });
+            builder.show();
         }
     }
 }

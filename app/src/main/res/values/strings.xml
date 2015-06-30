@@ -4,6 +4,7 @@
     <string name="login_str_description">Description Description Description...</string>
 
     <string name="title_activity_register">Register</string>
+    <string name="register_str_secret_question">Select a secret question</string>
 
     <string name="feedback_str_yes">Yes</string>
     <string name="feedback_str_maybe">Maybe</string>
