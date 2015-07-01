@@ -1,29 +1,26 @@
 package uk.ac.gla.dcs.gms.lms;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.Map;
+import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends ActionBarActivity
@@ -33,6 +30,8 @@ public class MainActivity extends ActionBarActivity
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    public static Activity instance = null;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -56,44 +55,90 @@ public class MainActivity extends ActionBarActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
         fragmentManager = getSupportFragmentManager();
+
+        instance = this;
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
+        CustomMapFragment customMapFragment;
+        Bundle bundle;
 
-        if (position == 2) {
-            uk.ac.gla.dcs.gms.lms.MapFragment mapFragment = new uk.ac.gla.dcs.gms.lms.MapFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, mapFragment)
-                    .commit();
-            return;
+        switch (position) {
+            case 0:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, PlaceholderFragment.newInstance(position))
+                        .commit();
+                break;
+            case 1:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, PlaceholderFragment.newInstance(position))
+                        .commit();
+                break;
+            case 2:
+                bundle = new Bundle();
+                bundle.putDouble(CustomMapFragment.LAT, 43.1);
+                bundle.putDouble(CustomMapFragment.LNG, -87.9);
+                customMapFragment = new CustomMapFragment();
+                customMapFragment.setArguments(bundle);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, customMapFragment)
+                        .commit();
+                mTitle = getString(R.string.title_heat_map);
+                restoreActionBar();
+                break;
+            case 3:
+                bundle = new Bundle();
+                bundle.putDouble(CustomMapFragment.LAT, 51.470087);
+                bundle.putDouble(CustomMapFragment.LNG, -0.452046);
+                customMapFragment = new CustomMapFragment();
+                customMapFragment.setArguments(bundle);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, customMapFragment)
+                        .commit();
+                mTitle = getString(R.string.title_hot_spots);
+                restoreActionBar();
+                break;
+            case 4:
+                bundle = new Bundle();
+                bundle.putDouble(CustomMapFragment.LAT, 55.873399);
+                bundle.putDouble(CustomMapFragment.LNG, -4.289192);
+                customMapFragment = new CustomMapFragment();
+                customMapFragment.setArguments(bundle);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, customMapFragment)
+                        .commit();
+                mTitle = getString(R.string.title_around_you);
+                restoreActionBar();
+                break;
+            case 5:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, PlaceholderFragment.newInstance(position))
+                        .commit();
+                break;
         }
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
-            case 1:
+            case 0:
                 mTitle = getString(R.string.title_daily_summary);
                 break;
-            case 2:
+            case 1:
                 mTitle = getString(R.string.title_recently_upload);
                 break;
-            case 3:
+            case 2:
                 mTitle = getString(R.string.title_heat_map);
                 break;
-            case 4:
+            case 3:
                 mTitle = getString(R.string.title_hot_spots);
                 break;
-            case 5:
+            case 4:
                 mTitle = getString(R.string.title_around_you);
                 break;
-            case 6:
+            case 5:
                 mTitle = getString(R.string.title_feedback);
                 break;
         }
@@ -110,10 +155,6 @@ public class MainActivity extends ActionBarActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            //getMenuInflater().inflate(R.menu.main, menu);
             restoreActionBar();
             return true;
         }
@@ -135,10 +176,12 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+
+
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class PlaceholderFragment extends Fragment implements AbsListView.OnScrollListener {
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -169,32 +212,42 @@ public class MainActivity extends ActionBarActivity
             View rootView;
             Log.v("new", Integer.toString(sectionNumber));
 
-            if (sectionNumber == 1) {
+            if (sectionNumber == 0 || sectionNumber == 1) {
                 rootView = inflater.inflate(R.layout.daily_summary, container, false);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img1)).setImageResource(R.drawable.bonus_coin);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img2)).setImageResource(R.drawable.bonus_coin);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img3)).setImageResource(R.drawable.bonus_coin);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img4)).setImageResource(R.drawable.bonus_coin);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img5)).setImageResource(R.drawable.bonus_coin);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img6)).setImageResource(R.drawable.bonus_coin);
-            }
-            else if (sectionNumber == 2) {
-                rootView = inflater.inflate(R.layout.daily_summary, container, false);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img1)).setImageResource(R.drawable.bonus_tree);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img2)).setImageResource(R.drawable.bonus_tree);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img3)).setImageResource(R.drawable.bonus_tree);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img4)).setImageResource(R.drawable.bonus_tree);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img5)).setImageResource(R.drawable.bonus_tree);
-                ((ImageView)rootView.findViewById(R.id.daily_summary_iview_img6)).setImageResource(R.drawable.bonus_tree);
-            }
-            else if (sectionNumber == 3) {
-                rootView = inflater.inflate(R.layout.maps, container, false);
-            }
-            else if (sectionNumber == 4) {
-                rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            }
-            else if (sectionNumber == 5) {
-                rootView = inflater.inflate(R.layout.fragment_main, container, false);
+                mHandler = new Handler();
+
+                //inflate the progress bar from the footer, it is wrapped in a FrameLayout since
+                //ListViews don't shrink in height when a child is set to visibility gone, but
+                //a FrameLayout with height of wrap_content will
+                View footer = inflater.inflate(R.layout.progress_bar_footer, null);
+                progressBar = (ProgressBar) footer.findViewById(R.id.progressBar);
+
+                listView = (ListView) rootView.findViewById(R.id.listView);
+                listView.addFooterView(footer);
+
+                //Adding images to the list view
+                Integer coin = R.drawable.bonus_coin;
+                Integer tree = R.drawable.bonus_tree;
+
+                Pair<Integer, Integer> p1 = new Pair<>(coin, coin);
+                Pair<Integer, Integer> p2 = new Pair<>(coin, tree);
+                Pair<Integer, Integer> p3 = new Pair<>(tree, coin);
+                Pair<Integer, Integer> p4 = new Pair<>(tree, tree);
+
+                ArrayList<Pair> vet = new ArrayList<>();
+
+                for (int i=0; i<15; i++) {
+                    vet.add(new Pair<>(p1.first, p1.second));
+                    vet.add(new Pair<>(p2.first, p2.second));
+                    vet.add(new Pair<>(p3.first, p3.second));
+                    vet.add(new Pair<>(p4.first, p4.second));
+                }
+
+                adapter = new ImageScroller(instance, R.layout.row_layout, vet, 10, 5);
+                listView.setAdapter(adapter);
+                listView.setOnScrollListener(this); //listen for a scroll movement to the bottom
+                progressBar.setVisibility((20 < vet.size()) ? View.VISIBLE : View.GONE);
+
             }
             else
                 rootView = inflater.inflate(R.layout.feedback, container, false);
@@ -205,7 +258,48 @@ public class MainActivity extends ActionBarActivity
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+
+        //Test for list view
+
+        private ListView listView;
+        private ProgressBar progressBar;
+        private ImageScroller adapter;
+        private Handler mHandler;
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch(item.getItemId()){
+                //case R.id.action_reset:
+                    //adapter.reset(); //reset the adapter to its initial configuration
+                    //listView.setSelection(0); //go to the top
+                    //return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if(firstVisibleItem + visibleItemCount == totalItemCount && !adapter.endReached() && !hasCallback){ //check if we've reached the bottom
+                mHandler.postDelayed(showMore, 300);
+                hasCallback = true;
+            }
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
 
         }
+
+        private boolean hasCallback;
+        private Runnable showMore = new Runnable(){
+            public void run(){
+                boolean noMoreToShow = adapter.showMore(); //show more views and find out if
+                progressBar.setVisibility(noMoreToShow? View.GONE : View.VISIBLE);
+                hasCallback = false;
+            }
+        };
     }
+
+
 }

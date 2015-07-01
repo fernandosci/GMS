@@ -1,70 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/daily_summary_iview_img1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="55dp" />
-
-    <ImageView
-        android:id="@+id/daily_summary_iview_img2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/daily_summary_iview_img1"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="60dp" />
-
-    <ImageView
-        android:id="@+id/daily_summary_iview_img3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/daily_summary_iview_img2"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="60dp" />
-
-    <ImageView
-        android:id="@+id/daily_summary_iview_img4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="55dp"
-        android:layout_marginTop="55dp" />
-
-    <ImageView
-        android:id="@+id/daily_summary_iview_img5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/daily_summary_iview_img4"
-        android:layout_marginEnd="50dp"
-        android:layout_marginTop="60dp" />
-
-    <ImageView
-        android:id="@+id/daily_summary_iview_img6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/daily_summary_iview_img5"
-        android:layout_marginEnd="50dp"
-        android:layout_marginTop="60dp" />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="438dp"
+        android:id="@+id/listView"
+        android:layout_gravity="center_horizontal"
+        android:layout_above="@+id/button2"
+        android:layout_alignParentTop="true" />
 
     <Button
-        android:id="@+id/date_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Date Picker"
+        android:id="@+id/button2"
+        android:layout_gravity="center_horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="Date Picker" />
-
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
