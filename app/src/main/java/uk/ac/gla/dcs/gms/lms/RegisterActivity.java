@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import uk.ac.gla.dcs.gms.Utils;
-import uk.ac.gla.dcs.gms.api.APIResponse;
+import uk.ac.gla.dcs.gms.api.APIHttpResponse;
 import uk.ac.gla.dcs.gms.api.LMSRegisterRequest;
 import uk.ac.gla.dcs.gms.api.validation.RegisterValidation;
 
@@ -74,7 +74,7 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                 //send details to server
                 LMSRegisterRequest request = new LMSRegisterRequest(getApplicationContext()) {
                     @Override
-                    protected void onPostExecute(APIResponse apiResponse) {
+                    protected void onPostExecute(APIHttpResponse apiResponse) {
 
                         Bundle bundle = new Bundle();
                         //bundle.putString(EMAIL, email);

@@ -11,17 +11,23 @@ import java.util.Map;
 /**
  * Created by ito on 29/06/2015.
  */
-public class APIResponse {
+public class APIHttpResponse {
 
-    private static final String TAG = "APIResponse";
+    public enum ErrorType{
+        NETWORKFAILED, NODATA
+    }
+
+    private static final String TAG = "APIHttpResponse";
+
+    private Map<String, List<String>> headerFields;
 
     private String rawResponse;
-    private Map<String, List<String>> headerFields;
+
     private Exception exception;
     private boolean failed;
     private JSONObject jsonObject;
 
-    public APIResponse(String response, Map<String, List<String>> headerFields, boolean failed, Exception exception) {
+    public APIHttpResponse(String response, Map<String, List<String>> headerFields, boolean failed, Exception exception) {
         this.rawResponse = response;
         this.headerFields = headerFields;
         this.failed = failed;

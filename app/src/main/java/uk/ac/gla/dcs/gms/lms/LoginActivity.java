@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import uk.ac.gla.dcs.gms.api.APIHandler;
-import uk.ac.gla.dcs.gms.api.APIResponse;
+import uk.ac.gla.dcs.gms.api.APIHttpResponse;
 import uk.ac.gla.dcs.gms.api.LMSLoginRequest;
 
 @SuppressWarnings("deprecation")
@@ -62,7 +62,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
             LMSLoginRequest request = new LMSLoginRequest(getApplicationContext()) {
                 @Override
-                protected void onPostExecute(APIResponse s) {
+                protected void onPostExecute(APIHttpResponse s) {
                     String dataField = getResources().getString(R.string.success_field_data);
                     String errorField = getResources().getString(R.string.error_field_errors);
 

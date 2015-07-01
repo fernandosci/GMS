@@ -15,7 +15,7 @@ import uk.ac.gla.dcs.gms.lms.R;
 /**
  * Created by ito on 29/06/2015.
  */
-public abstract class LMSLoginRequest extends AsyncTask<String, Integer, APIResponse> {
+public abstract class LMSLoginRequest extends AsyncTask<String, Integer, APIHttpResponse> {
 
     private Context context;
 
@@ -24,8 +24,8 @@ public abstract class LMSLoginRequest extends AsyncTask<String, Integer, APIResp
     }
 
     @Override
-    protected APIResponse doInBackground(String... params) {
-        APIResponse response;
+    protected APIHttpResponse doInBackground(String... params) {
+        APIHttpResponse response;
 
         try {
             URL url = new URL(context.getResources().getString(R.string.lms_httpUrl) + context.getResources().getString(R.string.lms_httpUrlLogin));
@@ -43,10 +43,10 @@ public abstract class LMSLoginRequest extends AsyncTask<String, Integer, APIResp
 
             InputStream in = urlConnection.getInputStream();
 
-            response = new APIResponse(IOUtils.toString(in, "UTF-8"),urlConnection.getHeaderFields(),false,null);
+            response = new APIHttpResponse(IOUtils.toString(in, "UTF-8"),urlConnection.getHeaderFields(),false,null);
         } catch (Exception e) {
             e.printStackTrace();
-            response = new APIResponse(null,null,true,e);
+            response = new APIHttpResponse(null,null,true,e);
         }
 
         return response;

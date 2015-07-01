@@ -3,10 +3,8 @@ package uk.ac.gla.dcs.gms.api;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Base64;
-import android.util.Log;
 
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -17,7 +15,7 @@ import uk.ac.gla.dcs.gms.lms.R;
 /**
  * Created by ito on 29/06/2015.
  */
-public abstract class LMSRegisterRequest extends AsyncTask<String, Integer, APIResponse> {
+public abstract class LMSRegisterRequest extends AsyncTask<String, Integer, APIHttpResponse> {
 
     private Context context;
 
@@ -26,8 +24,8 @@ public abstract class LMSRegisterRequest extends AsyncTask<String, Integer, APIR
     }
 
     @Override
-    protected APIResponse doInBackground(String... params) {
-        APIResponse response;
+    protected APIHttpResponse doInBackground(String... params) {
+        APIHttpResponse response;
 
         try {
             URL url = new URL(context.getResources().getString(R.string.lms_httpUrl) + context.getResources().getString(R.string.lms_httpUrlRegister));
@@ -47,11 +45,11 @@ public abstract class LMSRegisterRequest extends AsyncTask<String, Integer, APIR
             urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
             InputStream in = urlConnection.getInputStream();
-            response = new APIResponse(IOUtils.toString(in, "UTF-8"),urlConnection.getHeaderFields(),false,null);
+            response = new APIHttpResponse(IOUtils.toString(in, "UTF-8"),urlConnection.getHeaderFields(),false,null);
 
         } catch (Exception e) {
             e.printStackTrace();
-            response = new APIResponse(null,null,true,e);
+            response = new APIHttpResponse(null,null,true,e);
         }
 
         return response;
