@@ -8,7 +8,6 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'commons-validator:commons-validator:1.4.0@jar'
     compile 'org.passay:passay:1.0@jar'
-
 }
 
 android {
