@@ -88,7 +88,7 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                     }
                 };
                  //(username + ":" + password + ":" + email + ":" + answer + ":" + question)
-                request.execute(getResources().getString(R.string.username), getResources().getString(R.string.password), "email", "answer", "question");
+                request.execute(getString(R.string.username), getString(R.string.password), "email", "answer", "question");
             }
 
         } else if (v.getId() == R.id.register_tview_secret_question) {
