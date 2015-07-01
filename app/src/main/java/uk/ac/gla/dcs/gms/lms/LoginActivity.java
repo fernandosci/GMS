@@ -41,7 +41,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         if (requestCode == REGISTER) {
             if (resultCode == Activity.RESULT_OK) {
                 Bundle bundle = intent.getExtras();
-                String email = (String) bundle.get(RegisterActivity.EMAIL);
+                String email = (String) bundle.get(RegisterActivity.KEY_EMAIL);
 
                 ((EditText)findViewById(R.id.login_edittxt_email)).setText(email);
             }
