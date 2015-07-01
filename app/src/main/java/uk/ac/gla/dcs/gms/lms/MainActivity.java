@@ -26,12 +26,12 @@ import java.util.ArrayList;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    public static Activity instance = null;
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
-    public static Activity instance = null;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -66,6 +66,10 @@ public class MainActivity extends ActionBarActivity
         CustomMapFragment customMapFragment;
         Bundle bundle;
 
+        String[] titles = getResources().getStringArray(R.array.main_titles);
+
+        mTitle = titles[position];
+
         switch (position) {
             case 0:
                 fragmentManager.beginTransaction()
@@ -86,7 +90,6 @@ public class MainActivity extends ActionBarActivity
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, customMapFragment)
                         .commit();
-                mTitle = getString(R.string.title_heat_map);
                 restoreActionBar();
                 break;
             case 3:
@@ -98,7 +101,6 @@ public class MainActivity extends ActionBarActivity
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, customMapFragment)
                         .commit();
-                mTitle = getString(R.string.title_hot_spots);
                 restoreActionBar();
                 break;
             case 4:
@@ -110,7 +112,6 @@ public class MainActivity extends ActionBarActivity
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, customMapFragment)
                         .commit();
-                mTitle = getString(R.string.title_around_you);
                 restoreActionBar();
                 break;
             case 5:
@@ -122,26 +123,8 @@ public class MainActivity extends ActionBarActivity
     }
 
     public void onSectionAttached(int number) {
-        switch (number) {
-            case 0:
-                mTitle = getString(R.string.title_daily_summary);
-                break;
-            case 1:
-                mTitle = getString(R.string.title_recently_upload);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_heat_map);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_hot_spots);
-                break;
-            case 4:
-                mTitle = getString(R.string.title_around_you);
-                break;
-            case 5:
-                mTitle = getString(R.string.title_feedback);
-                break;
-        }
+        String[] titles = getResources().getStringArray(R.array.main_titles);
+        mTitle = titles[number];
     }
 
     public void restoreActionBar() {

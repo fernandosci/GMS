@@ -20,13 +20,6 @@
 
     <string name="title_single_view">Media Viewer</string>
 
-    <string name="title_daily_summary">Daily Summary</string>
-    <string name="title_recently_upload">Images</string>
-    <string name="title_heat_map">Heat Map</string>
-    <string name="title_hot_spots">Hot Spots</string>
-    <string name="title_around_you">Around You</string>
-    <string name="title_feedback">Feedback</string>
-
     <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">
         AIzaSyDFQb-yV3wx78n9PYWFcJpx3TLTg8kuXgM
     </string>
