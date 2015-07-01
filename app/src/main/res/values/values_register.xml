@@ -8,4 +8,13 @@
         <item>Question 3</item>
     </string-array>
 
+    <string-array name="main_titles">
+        <item>Daily Summary</item>
+        <item>Images</item>
+        <item>Heat Map</item>
+        <item>Hot Spots</item>
+        <item>Around You</item>
+        <item>Feedback</item>
+    </string-array>
+
 </resources>
