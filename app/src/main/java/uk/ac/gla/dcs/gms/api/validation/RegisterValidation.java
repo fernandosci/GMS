@@ -1,5 +1,14 @@
 package uk.ac.gla.dcs.gms.api.validation;
 
+import org.apache.commons.validator.routines.EmailValidator;
+import org.passay.LengthRule;
+import org.passay.LowercaseCharacterRule;
+import org.passay.PasswordData;
+import org.passay.PasswordValidator;
+import org.passay.Rule;
+import org.passay.RuleResult;
+import org.passay.SpecialCharacterRule;
+import org.passay.UppercaseCharacterRule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,8 +31,8 @@ public class RegisterValidation {
     public static final int CONSTRAINT_MINSPECIALCHAR = 1;
 
     public static ValidationResult validateEmail(String email) {
-        //EmailValidator eValidator = EmailValidator.getInstance();
-        return new ValidationResult(true,new ArrayList<>(Arrays.asList("Invalid Email")));
+        EmailValidator eValidator = EmailValidator.getInstance();
+        return new ValidationResult(eValidator.isValid(email),new ArrayList<>(Arrays.asList("Invalid Email")));
     }
 
     public static ValidationResult validateFirstName(String firstName) {
@@ -45,18 +54,17 @@ public class RegisterValidation {
 
     public static ValidationResult validatePassword(String password) {
 
-//        List<Rule> rules = new ArrayList<>();
-//
-//        rules.add(new LengthRule(CONSTRAINT_PASSWORD_MINLENGTH, CONSTRAINT_PASSWORD_MAXLENGTH));
-//        rules.add(new UppercaseCharacterRule(CONSTRAINT_PASSWORD_MINUPPERCASE));
-//        rules.add(new LowercaseCharacterRule(CONSTRAINT_PASSWORD_MINLOWERCASE));
-//        rules.add(new SpecialCharacterRule(CONSTRAINT_MINSPECIALCHAR));
-//
-//        PasswordValidator validator = new PasswordValidator(rules);
-//        RuleResult result = validator.validate(new PasswordData(password));
-//
-//        return new ValidationResult(result.isValid(), validator.getMessages(result));
-        return new ValidationResult(true,new ArrayList<String>());
+        List<Rule> rules = new ArrayList<>();
+
+        rules.add(new LengthRule(CONSTRAINT_PASSWORD_MINLENGTH, CONSTRAINT_PASSWORD_MAXLENGTH));
+        rules.add(new UppercaseCharacterRule(CONSTRAINT_PASSWORD_MINUPPERCASE));
+        rules.add(new LowercaseCharacterRule(CONSTRAINT_PASSWORD_MINLOWERCASE));
+        rules.add(new SpecialCharacterRule(CONSTRAINT_MINSPECIALCHAR));
+
+        PasswordValidator validator = new PasswordValidator(rules);
+        RuleResult result = validator.validate(new PasswordData(password));
+
+        return new ValidationResult(result.isValid(), validator.getMessages(result));
     }
 
     public static ValidationResult validateConfirmation(String password, String confirmationPassword) {
