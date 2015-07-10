@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import uk.ac.gla.dcs.gms.Utils;
-
 public class ImageScroller extends ArrayAdapter<Pair> implements View.OnClickListener {
 
     public static final String IMG_ID = "img_id";
@@ -43,7 +41,8 @@ public class ImageScroller extends ArrayAdapter<Pair> implements View.OnClickLis
         if (t != null) {
             ImageView imageView = (ImageView) view.findViewById(R.id.row_layout_iview);
             ImageView imageView2 = (ImageView) view.findViewById(R.id.row_layout_iview2);
-            ((TextView)view.findViewById(R.id.textView)).setText(Integer.toString(position));
+           // ((TextView)view.findViewById(R.id.textView)).setText(Integer.toString(position));
+             ((TextView)view.findViewById(R.id.textView)).setText("");
             if (imageView != null) {
                 imageView.setImageResource((Integer) t.first);
                 imageView.setTag(t.first);

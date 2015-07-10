@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -15,13 +16,18 @@ import android.widget.TextView;
 
 import uk.ac.gla.dcs.gms.Utils;
 import uk.ac.gla.dcs.gms.api.APIHttpResponse;
-import uk.ac.gla.dcs.gms.api.LMSRegisterRequest;
+import uk.ac.gla.dcs.gms.api.HTTPCustomException;
+import uk.ac.gla.dcs.gms.api.lms.LMSAuthenticationRequest;
+import uk.ac.gla.dcs.gms.api.Security;
 import uk.ac.gla.dcs.gms.api.validation.RegisterValidation;
 
 @SuppressWarnings("deprecation")
 public class RegisterActivity extends ActionBarActivity implements View.OnClickListener {
 
+    private static final String TAG = "RegisterActivity";
+
     public final static String KEY_EMAIL = "REGISTERACTIVITY.EMAIL";
+
 
     private EditText editTxtEmail;
     private EditText editTxtFirstName;
@@ -72,23 +78,50 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
 
             if (validate()) {
                 //send details to server
-                LMSRegisterRequest request = new LMSRegisterRequest(getApplicationContext()) {
+                LMSAuthenticationRequest request = new LMSAuthenticationRequest(getApplicationContext(), LMSAuthenticationRequest.REGISTER) {
                     @Override
                     protected void onPostExecute(APIHttpResponse apiResponse) {
 
-                        Bundle bundle = new Bundle();
-                        //bundle.putString(EMAIL, email);
+                        try {
+                            String tokenFromResponse = getTokenFromResponse(apiResponse);
+                            Security.setToken(getApplicationContext(), tokenFromResponse);
+                            Bundle bundle = new Bundle();
+                            bundle.putString(KEY_EMAIL, editTxtEmail.getText().toString());
+                            Intent intent = new Intent();
+                            intent.putExtras(bundle);
+                            setResult(Activity.RESULT_OK, intent);
+                            finish();
 
-                        Intent intent = new Intent();
-                        intent.putExtras(bundle);
-
-                        setResult(Activity.RESULT_OK, intent);
-                        finish();
-                        Utils.shortToast(getApplicationContext(), apiResponse.getRawResponse());
+                        } catch (HTTPCustomException e) {
+                            Log.e(TAG, e.getMessage());
+                            Utils.shortToast(getApplicationContext(), e.getMessage());
+                        } catch (uk.ac.gla.dcs.gms.api.SecurityException e) {
+                            e.printStackTrace();
+                            Utils.shortToast(getApplicationContext(), "Security failure.");
+                        } finally {
+                            btnRegister.setEnabled(true);
+                        }
                     }
                 };
-                 //(username + ":" + password + ":" + email + ":" + answer + ":" + question)
-                request.execute(getString(R.string.username), getString(R.string.password), "email", "answer", "question");
+                btnRegister.setEnabled(false);
+                // (username + ":" + password + ":" + email + ":" + answer + ":" + question)
+                request.execute(
+                        editTxtEmail.getText().toString(),
+                        editTxtPassword.getText().toString(),
+                        editTxtEmail.getText().toString(),
+                        editTxtAnswer.getText().toString(),
+                        "question"                  //fixme
+                );
+//                request.execute(
+//                        editTxtEmail.getText().toString(),
+//                        editTxtPassword.getText().toString(),
+//                        editTxtEmail.getText().toString(),
+//                        editTxtAnswer.getText().toString(),
+//                        tViewSecretQuestion.getText().toString()
+//                );
+                //request.execute(getString(R.string.debug_username), getString(R.string.debug_password), "email", "answer", "question");
+            } else {
+                Utils.shortToast(getApplicationContext(), "Please fill all missing fields.");
             }
 
         } else if (v.getId() == R.id.register_tview_secret_question) {
@@ -100,6 +133,7 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     tViewSecretQuestion.setText(questions[which]);
+                    tViewSecretQuestion.setTag(0, true);
                     editTxtAnswer.requestFocus();
                 }
             });
@@ -109,57 +143,59 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
 
     private void setViewValidationState(View v, RegisterValidation.ValidationResult validationResult) {
 
-        if (validationResult.isValid()){
+        if (validationResult.isValid()) {
 
-        }else{
+        } else {
 
         }
     }
 
     private boolean validatePasswordConfirmation() {
         RegisterValidation.ValidationResult validationResult = RegisterValidation.validateConfirmation(editTxtPassword.getText().toString(), editTxtConfirmPassword.getText().toString());
-        setViewValidationState(editTxtPassword,validationResult);
+        setViewValidationState(editTxtPassword, validationResult);
         return validationResult.isValid();
     }
 
     private boolean validatePassword() {
         RegisterValidation.ValidationResult validationResult = RegisterValidation.validatePassword(editTxtPassword.getText().toString());
-        setViewValidationState(editTxtPassword,validationResult);
+        setViewValidationState(editTxtPassword, validationResult);
         return validationResult.isValid();
     }
 
     private boolean validateSecretAnswer() {
         RegisterValidation.ValidationResult validationResult = RegisterValidation.validateAnswer(editTxtAnswer.getText().toString());
-        setViewValidationState(editTxtAnswer,validationResult);
+        setViewValidationState(editTxtAnswer, validationResult);
         return validationResult.isValid();
     }
 
     private boolean validateSecretQuestion() {
         RegisterValidation.ValidationResult validationResult = RegisterValidation.validateSecretQuestion(tViewSecretQuestion.getText().toString());
-        setViewValidationState(tViewSecretQuestion,validationResult);
+        setViewValidationState(tViewSecretQuestion, validationResult);
         return validationResult.isValid();
     }
 
     private boolean validateLastName() {
         RegisterValidation.ValidationResult validationResult = RegisterValidation.validateLastName(editTxtLastName.getText().toString());
-        setViewValidationState(editTxtLastName,validationResult);
+        setViewValidationState(editTxtLastName, validationResult);
         return validationResult.isValid();
     }
 
     private boolean validateFirstName() {
         RegisterValidation.ValidationResult validationResult = RegisterValidation.validateFirstName(editTxtFirstName.getText().toString());
-        setViewValidationState(editTxtFirstName,validationResult);
+        setViewValidationState(editTxtFirstName, validationResult);
         return validationResult.isValid();
     }
 
     private boolean validateEmail() {
+        if (true)
+        return true;
         RegisterValidation.ValidationResult validationResult = RegisterValidation.validateEmail(editTxtEmail.getText().toString());
-        setViewValidationState(editTxtEmail,validationResult);
+        setViewValidationState(editTxtEmail, validationResult);
         return validationResult.isValid();
     }
 
     private boolean validate() {
-        return  validateEmail() &&  validateFirstName() && validateLastName() && validateSecretQuestion() && validateSecretAnswer() && validatePassword() && validatePasswordConfirmation();
+        return validateEmail() && validateFirstName() && validateLastName() && validateSecretQuestion() && validateSecretAnswer() && validatePassword() && validatePasswordConfirmation();
     }
 
     private class localFocusLostListener implements View.OnFocusChangeListener {

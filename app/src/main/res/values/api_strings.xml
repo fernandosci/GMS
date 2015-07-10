@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="gmsrest_httpUrl">http://gmsrest.dcs.gla.ac.uk</string>
-    <string name="lms_httpUrl">http://192.168.30.128</string>
+    <string name="lms_httpUrl">http://192.168.74.131</string>
 
     <string name="lms_httpUrlLogin">/api/auth/local/login</string>
     <string name="lms_httpUrlRegister">/api/auth/local/register</string>
-
+    <string name="lms_httpUrlUser">/api/user</string>
     <string name="lms_httpUrlGetImage">/api/images/get</string>
 
 
-    <string name="username">debug</string>
-    <string name="password">abcdABCD1234!@#$</string>
+
 
 
     <string name="error_messages_genericNetworkFail">Network failed. Please try again latter.</string>
 
-    <string name="error_field_errors">errors</string>
-    <string name="success_field_data">data</string>
+    <string name="lms_api_StandardFieldErrorsKey">errors</string>
+    <string name="lms_api_StandardFieldDataKey">data</string>
+    <string name="lms_api_StandardFieldStatusKey">status</string>
 
-
+    <string name="debug_username">debug12345</string>
+    <string name="debug_password">abcdABCD1234!@#$</string>
 
 </resources>
