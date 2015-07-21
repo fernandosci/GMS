@@ -30,7 +30,7 @@ public abstract class LMSUserRequest extends LMSRequest<String, Integer, APIHttp
         APIHttpResponse response;
 
         try {
-            URL url = new URL(context.getResources().getString(R.string.lms_httpUrl) + context.getResources().getString(R.string.lms_httpUrlUser));
+            URL url = new URL(context.getResources().getString(R.string.lms_httpUrl) + context.getResources().getString(R.string.lms_endpointUser));
 
 
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

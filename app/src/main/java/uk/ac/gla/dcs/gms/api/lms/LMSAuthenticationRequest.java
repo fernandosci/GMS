@@ -41,10 +41,10 @@ public abstract class LMSAuthenticationRequest extends LMSRequest<String, Intege
             String authString;
 
             if (requestType == LOGIN) {
-                url = new URL(context.getResources().getString(R.string.lms_httpUrl) + context.getResources().getString(R.string.lms_httpUrlLogin));
+                url = new URL(context.getResources().getString(R.string.lms_httpUrl) + context.getResources().getString(R.string.lms_endpointLogin));
                 authString = params[0] + ":" + params[1];
             } else if (requestType == REGISTER) {
-                url = new URL(context.getResources().getString(R.string.lms_httpUrl) + context.getResources().getString(R.string.lms_httpUrlRegister));
+                url = new URL(context.getResources().getString(R.string.lms_httpUrl) + context.getResources().getString(R.string.lms_endpointRegister));
                 StringBuilder builder = new StringBuilder();
                 for (String str : params) {
                     builder.append(str + ":");
