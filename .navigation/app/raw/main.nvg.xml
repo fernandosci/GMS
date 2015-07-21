@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<navigationModel
+  ns = "http://schemas.android.com?import=com.android.tools.idea.editors.navigation.model.*">
+  <locations  
+    class = "java.util.ArrayList">
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "uk.ac.gla.dcs.gms.lms.RegisterActivity"/>
+      <point      
+        x = "1248"      
+        y = "80"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "uk.ac.gla.dcs.gms.lms.LoginActivity"/>
+      <point      
+        x = "2164"      
+        y = "152"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "uk.ac.gla.dcs.gms.lms.MainActivity"/>
+      <point      
+        x = "84"      
+        y = "236"/>
+    </statePointEntry>
+    <statePointEntry>
+      <state      
+        class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
+        className = "uk.ac.gla.dcs.gms.lms.SingleViewActivity"/>
+      <point      
+        x = "3148"      
+        y = "252"/>
+    </statePointEntry>
+  </locations>
+</navigationModel>
