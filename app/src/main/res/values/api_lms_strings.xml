@@ -23,7 +23,7 @@
 
 
 
-    <string name="error_messages_genericNetworkFail">Network failed. Please try again latter.</string>
+    <string name="lms_messages_errors_genericNetworkFail">Network failed. Please try again latter.</string>
 
     <string name="lms_api_StandardFieldErrorsKey">errors</string>
     <string name="lms_api_StandardFieldDataKey">data</string>

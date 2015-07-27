@@ -13,9 +13,11 @@ import android.widget.Toast;
 
 import uk.ac.gla.dcs.gms.Utils;
 import uk.ac.gla.dcs.gms.api.APIHandler;
-import uk.ac.gla.dcs.gms.api.APIHttpResponse;
-import uk.ac.gla.dcs.gms.api.HTTPCustomException;
+import uk.ac.gla.dcs.gms.api.http.APIHttpJSONResponse;
+import uk.ac.gla.dcs.gms.api.http.HTTPCustomException;
 import uk.ac.gla.dcs.gms.api.lms.LMSAuthenticationRequest;
+import uk.ac.gla.dcs.gms.api.lms.LMSImageRequest;
+import uk.ac.gla.dcs.gms.api.lms.LMSImageRequestParamBuilder;
 import uk.ac.gla.dcs.gms.api.lms.LMSUserRequest;
 import uk.ac.gla.dcs.gms.api.Security;
 import uk.ac.gla.dcs.gms.api.SecurityException;
@@ -93,7 +95,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
                 LMSAuthenticationRequest request = new LMSAuthenticationRequest(getApplicationContext(), LMSAuthenticationRequest.LOGIN) {
                     @Override
-                    protected void onPostExecute(APIHttpResponse s) {
+                    protected void onPostExecute(APIHttpJSONResponse s) {
                         try {
                             String tokenFromResponse = getTokenFromResponse(s);
                             Security.setToken(getApplicationContext(), tokenFromResponse);
@@ -118,7 +120,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     private void login(){
         LMSUserRequest request = new LMSUserRequest(this) {
             @Override
-            protected void onPostExecute(APIHttpResponse apiHttpResponse) {
+            protected void onPostExecute(APIHttpJSONResponse apiHttpResponse) {
                 super.onPostExecute(apiHttpResponse);
 
                 try {
@@ -130,6 +132,20 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             }
         };
         request.execute();
+
+        LMSImageRequest imgRequest = new LMSImageRequest(this) {
+            @Override
+            protected void onPostExecute(APIHttpJSONResponse apiHttpResponse) {
+                try {
+                    Object imageList = getImageList(apiHttpResponse);
+                } catch (HTTPCustomException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        imgRequest.execute(new LMSImageRequestParamBuilder().setKeyMoments().setLimit(10).setPersonal(true).setSkip(0).toString());
+
+
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
     }
 

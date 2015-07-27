@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="gms_error_registerFailure"> 2001</integer>
+    <integer name="gms_error_registerPartialFailure"> 2002</integer>
+
+    <integer name="gms_error_loginFailure"> 2013</integer>
+    <integer name="gms_error_loginPartialFailure"> 2014</integer>
+
+    <integer name="gms_error_fieldUpdateFailure"> 2023</integer>
+    <integer name="gms_error_fieldUpdatePartialFailure"> 2024</integer>
+
+
+</resources>

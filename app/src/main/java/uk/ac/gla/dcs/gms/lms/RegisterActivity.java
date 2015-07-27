@@ -15,8 +15,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import uk.ac.gla.dcs.gms.Utils;
-import uk.ac.gla.dcs.gms.api.APIHttpResponse;
-import uk.ac.gla.dcs.gms.api.HTTPCustomException;
+import uk.ac.gla.dcs.gms.api.http.APIHttpJSONResponse;
+import uk.ac.gla.dcs.gms.api.http.HTTPCustomException;
 import uk.ac.gla.dcs.gms.api.lms.LMSAuthenticationRequest;
 import uk.ac.gla.dcs.gms.api.Security;
 import uk.ac.gla.dcs.gms.api.validation.RegisterValidation;
@@ -80,7 +80,7 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                 //send details to server
                 LMSAuthenticationRequest request = new LMSAuthenticationRequest(getApplicationContext(), LMSAuthenticationRequest.REGISTER) {
                     @Override
-                    protected void onPostExecute(APIHttpResponse apiResponse) {
+                    protected void onPostExecute(APIHttpJSONResponse apiResponse) {
 
                         try {
                             String tokenFromResponse = getTokenFromResponse(apiResponse);

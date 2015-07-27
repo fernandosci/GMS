@@ -1,92 +1,79 @@
 package uk.ac.gla.dcs.gms.api.lms;
 
-/**
- * Created by ito on 08/07/2015.
- */
-public class LMSUser {
-    private static LMSUser ourInstance = null;
+import uk.ac.gla.dcs.gms.api.GMSUser;
 
-    public static LMSUser getInstance() {
-        if (ourInstance == null)
-            ourInstance = new LMSUser();
-        return ourInstance;
+public class LMSUser extends GMSUser{
+
+    public LMSUser() {
+        super(LMSService.SERVICENAME);
     }
 
-    private String id;;
-    private String username;
-    private String email;
-    private boolean uploadAsPrivate;
-    private String token;
-    private String tokenUpdate;
-    private String question;
-
-    private LMSUser() {
-    }
 
     public void fillUser(String id, String username, String email, boolean uploadAsPrivate, String token, String tokenUpdate, String question) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.uploadAsPrivate = uploadAsPrivate;
-        this.token = token;
-        this.tokenUpdate = tokenUpdate;
-        this.question = question;
+
+        user.put("id",id);
+        user.put("username",username);
+        user.put("email",email);
+        user.put("uploadAsPrivate", String.valueOf(uploadAsPrivate));
+        user.put("token",token);
+        user.put("tokenUpdate",tokenUpdate);
+        user.put("question",question);
     }
 
     public String getId() {
-        return id;
+        return user.get("id");
     }
 
     public void setId(String id) {
-        this.id = id;
+        user.put("id",id);
     }
 
     public String getUsername() {
-        return username;
+        return user.get("username");
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        user.put("username",username);
     }
 
     public String getEmail() {
-        return email;
+        return user.get("email");
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        user.put("email",email);
     }
 
-    public boolean isUploadAsPrivate() {
-        return uploadAsPrivate;
+    public boolean isUploadAsPrivate(){
+        return Boolean.parseBoolean(user.get("uploadAsPrivate"));
     }
 
     public void setUploadAsPrivate(boolean uploadAsPrivate) {
-        this.uploadAsPrivate = uploadAsPrivate;
+        user.put("uploadAsPrivate", String.valueOf(uploadAsPrivate));
     }
 
     public String getToken() {
-        return token;
+        return user.get("token");
     }
 
     public void setToken(String token) {
-        this.token = token;
+        user.put("token",token);
     }
 
     public String getTokenUpdate() {
-        return tokenUpdate;
+        return user.get("tokenUpdate");
     }
 
     public void setTokenUpdate(String tokenUpdate) {
-        this.tokenUpdate = tokenUpdate;
+        user.put("tokenUpdate",tokenUpdate);
     }
 
     public String getQuestion() {
-        return question;
+        return user.get("question");
     }
 
     public void setQuestion(String question) {
-        this.question = question;
+        user.put("question",question);
     }
 
     //    DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
