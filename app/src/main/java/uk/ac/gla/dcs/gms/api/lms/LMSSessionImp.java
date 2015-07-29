@@ -45,7 +45,6 @@ public class LMSSessionImp implements LMSSession {
     private LMSService lmsService;
     private String token;
     private boolean expired;
-    private HTTPResponseListener listener;
     private int timeout;
 
     public LMSSessionImp(Context context, LMSService lmsService) {
@@ -68,52 +67,46 @@ public class LMSSessionImp implements LMSSession {
         return context.getResources();
     }
 
-    @Override
-    public void setOnHttpResponseListener(HTTPResponseListener listener) {
-        this.listener = listener;
+    public void login(HTTPResponseListener listener, int requestCode, String username, String password) {
+        requestWithAuthorization(listener, PROCESSCODE_LOGIN, requestCode, getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointLogin), ""), username + ":" + password);
+    }
+
+    public void register(HTTPResponseListener listener, int requestCode, String username, String password, String email, String answer, String question) {
+        requestWithAuthorization(listener, PROCESSCODE_REGISTER, requestCode, getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointRegister), ""), username + ":" + password + ":" + email + ":" + answer + ":" + question);
     }
 
 
-    public void login(int requestCode, String username, String password) {
-        requestWithAuthorization(PROCESSCODE_LOGIN, requestCode, getUrlConnection(requestCode, getResources().getString(R.string.lms_endpointLogin), ""), username + ":" + password);
-    }
-
-    public void register(int requestCode, String username, String password, String email, String answer, String question) {
-        requestWithAuthorization(PROCESSCODE_REGISTER, requestCode, getUrlConnection(requestCode, getResources().getString(R.string.lms_endpointRegister), ""), username + ":" + password + ":" + email + ":" + answer + ":" + question);
-    }
-
-
-    public void getUserDetails(int requestCode) {
-        HttpURLConnection urlConnection = getUrlConnection(requestCode, getResources().getString(R.string.lms_endpointUser), "");
-        requestWithCookie(PROCESSCODE_USERDETAIL, requestCode, urlConnection, "GET");
+    public void getUserDetails(HTTPResponseListener listener, int requestCode) {
+        HttpURLConnection urlConnection = getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointUser), "");
+        requestWithCookie(listener, PROCESSCODE_USERDETAIL, requestCode, urlConnection, "GET");
     }
 
 
     @Override
-    public void getStats(int requestCode, String urlParameters) {
-        HttpURLConnection urlConnection = getUrlConnection(requestCode, getResources().getString(R.string.lms_endpointStats), urlParameters);
-        requestWithCookie(PROCESSCODE_STATS, requestCode, urlConnection, "GET");
+    public void getStats(HTTPResponseListener listener, int requestCode, String urlParameters) {
+        HttpURLConnection urlConnection = getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointStats), urlParameters);
+        requestWithCookie(listener, PROCESSCODE_STATS, requestCode, urlConnection, "GET");
 
     }
 
     @Override
-    public void getVideos(int requestCode, String urlParameters) {
-        HttpURLConnection urlConnection = getUrlConnection(requestCode, getResources().getString(R.string.lms_endpointGetVideos), urlParameters);
-        requestWithCookie(PROCESSCODE_VIDEOS, requestCode, urlConnection, "GET");
+    public void getVideos(HTTPResponseListener listener, int requestCode, String urlParameters) {
+        HttpURLConnection urlConnection = getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointGetVideos), urlParameters);
+        requestWithCookie(listener, PROCESSCODE_VIDEOS, requestCode, urlConnection, "GET");
 
     }
 
     @Override
-    public void getImages(int requestCode, String urlParameters) {
-        HttpURLConnection urlConnection = getUrlConnection(requestCode, getResources().getString(R.string.lms_endpointGetImages), urlParameters);
-        requestWithCookie(PROCESSCODE_IMAGES, requestCode, urlConnection, "GET");
+    public void getImages(HTTPResponseListener listener, int requestCode, String urlParameters) {
+        HttpURLConnection urlConnection = getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointGetImages), urlParameters);
+        requestWithCookie(listener, PROCESSCODE_IMAGES, requestCode, urlConnection, "GET");
 
     }
 
     @Override
-    public void getTrails(int requestCode, String urlParameters) {
-        HttpURLConnection urlConnection = getUrlConnection(requestCode, getResources().getString(R.string.lms_endpointGetTrails), urlParameters);
-        requestWithCookie(PROCESSCODE_TRAILS, requestCode, urlConnection, "GET");
+    public void getTrails(HTTPResponseListener listener, int requestCode, String urlParameters) {
+        HttpURLConnection urlConnection = getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointGetTrails), urlParameters);
+        requestWithCookie(listener, PROCESSCODE_TRAILS, requestCode, urlConnection, "GET");
 
     }
 
@@ -127,19 +120,19 @@ public class LMSSessionImp implements LMSSession {
     }
 
 
-    private HttpURLConnection getUrlConnection(int requestCode, String complement, String parameters) {
+    private HttpURLConnection getUrlConnection(HTTPResponseListener listener, int requestCode, String complement, String parameters) {
         try {
             return (HttpURLConnection) new URL(getResources().getString(R.string.lms_httpUrl) + complement + parameters).openConnection();
         } catch (IOException e) {
             //should never reach here
             e.printStackTrace();
             if (listener != null)
-                listener.onResponse(requestCode, false, null, e);
+                listener.onResponse(requestCode, false, new HashMap<String, Object>(0), e);
             return null;
         }
     }
 
-    private void requestWithAuthorization(int processCode, int requestCode, HttpURLConnection urlConnection, String authString) {
+    private void requestWithAuthorization(HTTPResponseListener listener, int processCode, int requestCode, HttpURLConnection urlConnection, String authString) {
         if (urlConnection == null)
             return;
 
@@ -152,7 +145,7 @@ public class LMSSessionImp implements LMSSession {
             //should never reach here
             e.printStackTrace();
             if (listener != null)
-                listener.onResponse(requestCode, false, null, e);
+                listener.onResponse(requestCode, false, new HashMap<String, Object>(0), e);
             return;
         }
         urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
@@ -160,11 +153,11 @@ public class LMSSessionImp implements LMSSession {
 
         urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 
-        LMSHttpJsonRequest request = new LMSHttpJsonRequest(requestCode, processCode);
+        LMSHttpJsonRequest request = new LMSHttpJsonRequest(listener, requestCode, processCode);
         request.execute(urlConnection);
     }
 
-    private void requestWithCookie(int processCode, int requestCode, HttpURLConnection urlConnection, String requestMethod) {
+    private void requestWithCookie(HTTPResponseListener listener, int processCode, int requestCode, HttpURLConnection urlConnection, String requestMethod) {
         if (urlConnection == null)
             return;
 
@@ -174,7 +167,7 @@ public class LMSSessionImp implements LMSSession {
             //should never reach here
             e.printStackTrace();
             if (listener != null)
-                listener.onResponse(requestCode, false, null, e);
+                listener.onResponse(requestCode, false, new HashMap<String, Object>(0), e);
             return;
         }
         urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
@@ -182,7 +175,7 @@ public class LMSSessionImp implements LMSSession {
 
         urlConnection.setRequestProperty("Cookie", "token=" + token);
 
-        LMSHttpJsonRequest request = new LMSHttpJsonRequest(requestCode, processCode);
+        LMSHttpJsonRequest request = new LMSHttpJsonRequest(listener, requestCode, processCode);
         request.execute(urlConnection);
     }
 
@@ -191,10 +184,12 @@ public class LMSSessionImp implements LMSSession {
         private static final String TAG = "LMSHttpRequest";
         private int requestCode;
         private int processCode;
+        private final HTTPResponseListener httpResponseListener;
 
-        public LMSHttpJsonRequest(int requestCode, int processCode) {
+        public LMSHttpJsonRequest(HTTPResponseListener httpResponseListener, int requestCode, int processCode) {
             this.requestCode = requestCode;
             this.processCode = processCode;
+            this.httpResponseListener = httpResponseListener;
         }
 
         @Override
@@ -281,7 +276,7 @@ public class LMSSessionImp implements LMSSession {
                 HashMap<String, Object> data = null;
                 try {
                     data = processResponse(processCode, status, errorMessages, dataObj, response);
-                    listener.onResponse(requestCode, true, data, null);
+                    httpResponseListener.onResponse(requestCode, errorMessages != null, data, null);
                     //success!
                     return;
                 } catch (Exception e) {
@@ -291,7 +286,7 @@ public class LMSSessionImp implements LMSSession {
                 }
             }
             //here there was an exception, forward it...
-            listener.onResponse(requestCode, false, null, exceptionBuilder.addExtra("response", response).build());
+            httpResponseListener.onResponse(requestCode, false, new HashMap<String, Object>(0), exceptionBuilder.addExtra("response", response).build());
         }
 
         @Override

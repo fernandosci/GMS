@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.gla.dcs.gms.api.AuthenticationProvider;
-import uk.ac.gla.dcs.gms.api.CredentialContainer;
+import uk.ac.gla.dcs.gms.api.CredentialAdapter;
 import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.GMSUser;
 import uk.ac.gla.dcs.gms.api.OnCredentialsRequiredListener;
@@ -37,6 +37,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     private Context context;
     private OnCredentialsRequiredListener credListener;
     private HTTPResponseListener responseListener;
+    private HTTPResponseListener proxyResponseListener;
 
     private GMSUser gmsUser;
 
@@ -45,6 +46,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         this.context = context.getApplicationContext();
         this.credListener = null;
         this.responseListener = null;
+        this.proxyResponseListener = new LocalProxyResponseListener();
 
         try {
             gmsUser = GMSUser.fromFile(context, USERFILENAME);
@@ -54,7 +56,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     }
 
     @Override
-    public void register(Map<String, String> fields) throws GMSException {
+    public void register(HTTPResponseListener httpResponseListener, int requestCode, Map<String, String> fields) throws GMSException {
         //first, check for all fields
 
         boolean checkResult = true;
@@ -66,7 +68,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         }
 
         if (checkResult){
-            getToken(OPERATION_REGISTER,fields);
+            getToken(httpResponseListener, OPERATION_REGISTER,fields);
         }else{
             throw new GMSException("Missing fields.",null,-1);
         }
@@ -74,11 +76,11 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     }
 
     @Override
-    public void loginWithCredentials(CredentialContainer container) throws GMSException {
+    public void loginWithCredentials(HTTPResponseListener httpResponseListener, int requestCode, CredentialAdapter credAdapter) throws GMSException {
 
-        if (container.getProvider() == "local") {
-            if (container.getFields().contains("username") && container.getFields().contains("password"))
-                getToken(OPERATION_LOCAL, container.getInfo());
+        if (credAdapter.getProvider().equals("local")) {
+            if (credAdapter.getFields().contains("username") && credAdapter.getFields().contains("password"))
+                getToken(httpResponseListener, OPERATION_LOCAL, credAdapter.getMap());
             else
                 throw new GMSException("Missing fields.", null, -1);
         }else{
@@ -86,37 +88,16 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         }
     }
 
-    private void getToken(int operation, Map<String, String> data){
+    private void getToken(HTTPResponseListener httpResponseListener, int operation, Map<String, String> data){
 
         LMSSessionImp tmpSession = new LMSSessionImp(context,this);
-        tmpSession.setOnHttpResponseListener(new HTTPResponseListener() {
-            @Override
-            public void onResponse(int requestCode, boolean successful, HashMap<String, Object> data, Exception exception) {
-
-                if (requestCode == OPERATION_REGISTER || requestCode == OPERATION_LOCAL) {
-
-                    if (successful) {
-                        gmsUser.getUser().put("token", data.get("token").toString());
-                    }
-                }else
-                    exception =  new UnsupportedOperationException();
-
-                if (responseListener != null)
-                    responseListener.onResponse(requestCode, successful, data, exception);
-            }
-
-            @Override
-            public void onProgress(int requestCode, HTTPProgressStatus progressStatus, HashMap<String, Object> newdata) {
-            }
-        });
-
 
         switch (operation){
             case OPERATION_REGISTER:{
-                tmpSession.register(OPERATION_REGISTER, data.get("username"), data.get("password"), data.get("email"), data.get("answer"), data.get("question"));
+                tmpSession.register(httpResponseListener, OPERATION_REGISTER, data.get("username"), data.get("password"), data.get("email"), data.get("answer"), data.get("question"));
             }break;
             case OPERATION_LOCAL: {
-                tmpSession.login(OPERATION_LOCAL, data.get("username"), data.get("password"));
+                tmpSession.login(httpResponseListener, OPERATION_LOCAL, data.get("username"), data.get("password"));
             }break;
             default:
                 throw new UnsupportedOperationException();
@@ -129,19 +110,13 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     }
 
     @Override
-    public void setOnHttpResponseListener(HTTPResponseListener listener) {
-        this.setOnHttpResponseListener(listener);
-    }
-
-    @Override
-    public boolean isLoggedIn() {
+    public void isLoggedIn(HTTPResponseListener httpResponseListener, int requestCode) {
         //FIXME think in a better way to do it
-
-        return gmsUser.getUser().containsKey("token");
+        httpResponseListener.onResponse(requestCode,gmsUser.getUser().containsKey("token"), new HashMap<String, Object>(0), null);
     }
 
     @Override
-    public Set<String> getLoggedProviders() {
+    public void getLoggedProviders(HTTPResponseListener httpResponseListener) {
         throw new UnsupportedOperationException();
     }
 
@@ -199,7 +174,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     }
 
     public LMSSession getLMSSession() throws GMSException{
-        if (isLoggedIn()) {
+        if (gmsUser.getUser().containsKey("token")) {
             return new LMSSessionImp(context, this, gmsUser.getUser().get("token"));
         }else
             throw new GMSException("Not logged in", null, -1);
@@ -209,5 +184,26 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     @Override
     public String toString() {
         return SERVICENAME;
+    }
+
+    private class LocalProxyResponseListener implements HTTPResponseListener {
+        @Override
+        public void onResponse(int requestCode, boolean successful, HashMap<String, Object> data, Exception exception) {
+
+            if (requestCode == OPERATION_REGISTER || requestCode == OPERATION_LOCAL) {
+
+                if (successful) {
+                    gmsUser.getUser().put("token", data.get("token").toString());
+                }
+            }else
+                exception =  new UnsupportedOperationException();
+
+            if (responseListener != null)
+                responseListener.onResponse(requestCode, successful, data, exception);
+        }
+
+        @Override
+        public void onProgress(int requestCode, HTTPProgressStatus progressStatus, HashMap<String, Object> newdata) {
+        }
     }
 }

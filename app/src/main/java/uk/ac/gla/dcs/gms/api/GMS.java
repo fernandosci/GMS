@@ -2,52 +2,66 @@ package uk.ac.gla.dcs.gms.api;
 
 import android.content.Context;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import uk.ac.gla.dcs.gms.api.http.HTTPResponseCaller;
+import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 import uk.ac.gla.dcs.gms.api.lms.LMSService;
 import uk.ac.gla.dcs.gms.api.lms.LMSSession;
-import uk.ac.gla.dcs.gms.lms.R;
-import uk.ac.gla.dcs.gms.utils.FileUtils;
 
-public class GMS implements ServiceProvider,AuthenticationProvider, RegistrationProvider {
-    private static final String SERVICENAME = "GMS local Service";
+public class GMS implements ServiceProvider, AuthenticationProvider, RegistrationProvider {
     private static final String TAG = "GMS";
+    private static final String SERVICENAME = "GMS local Service";
     private static final String FILE_USERINFO = "gms_userinfo";
-
     private static GMS instance = null;
-    public static GMS getInstance(Context context) {
+    private final Context context;
+    private final Map<String, ServiceProvider> services;
+    private int authProvCount;
+    private int regProvCount;
+    private OnCredentialsRequiredListener credListener;
+    private GMS(Context context) {
+        this.context = context.getApplicationContext();
+
+        services = new HashMap<>();
+        credListener = null;
+        authProvCount = 0;
+        regProvCount = 0;
+
+        this.init();
+    }
+
+    public static void initialize(Context context){
         if (instance == null) {
             instance = new GMS(context.getApplicationContext());
+        }
+    }
+
+
+    public static GMS getInstance() {
+        if (instance == null) {
+            throw new ExceptionInInitializerError();
         }
         return instance;
     }
 
-    private final Context context;
-
-    private Map<String,ServiceProvider> services;
-
-    private HTTPResponseListener responseListener;
-
-
-    public GMS(Context context) {
-        this.context = context.getApplicationContext();
-
-        services = new HashMap<>();
-
-        initialize();
-    }
-
-    private void initialize(){
-
+    private void init() {
         //add services
         //lms
         LMSService lmsService = new LMSService(context);
         services.put(LMSService.class.getSimpleName(), lmsService);
+
+        Collection<ServiceProvider> values = services.values();
+        for (ServiceProvider srv : values){
+            if (srv instanceof AuthenticationProvider)
+                authProvCount++;
+            if (srv instanceof RegistrationProvider)
+                regProvCount++;
+        }
     }
 
     @Override
@@ -59,8 +73,7 @@ public class GMS implements ServiceProvider,AuthenticationProvider, Registration
     public boolean isServiceFullAvailable() throws GMSException {
         boolean result = true;
 
-        for (ServiceProvider srv : services.values())
-        {
+        for (ServiceProvider srv : services.values()) {
             result = result && srv.isServiceFullAvailable();
         }
 
@@ -71,8 +84,7 @@ public class GMS implements ServiceProvider,AuthenticationProvider, Registration
     public boolean isServicePartiallyAvailable() throws GMSException {
         boolean result = false;
 
-        for (ServiceProvider srv : services.values())
-        {
+        for (ServiceProvider srv : services.values()) {
             result = result || srv.isServiceFullAvailable();
         }
 
@@ -80,71 +92,66 @@ public class GMS implements ServiceProvider,AuthenticationProvider, Registration
     }
 
     @Override
-    public void loginWithCredentials(CredentialContainer container) throws GMSException {
+    public void register(HTTPResponseListener httpResponseListener, int requestCode, Map<String, String> fields) throws GMSException {
+
+        boolean checkResult = true;
+        Set<String> requiredRegisterFields = getRequiredRegisterFields();
+        for (String str : requiredRegisterFields) {
+            if (!fields.containsKey(str)) {
+                checkResult = false;
+                break;
+            }
+        }
+
+        if (checkResult) {
+            MyHTTPResponseListener internalProxyResponseListener = new MyHTTPResponseListener(httpResponseListener, requestCode, regProvCount);
+
+            for (ServiceProvider srv : services.values()) {
+
+                if (srv instanceof RegistrationProvider){
+                    RegistrationProvider regProv = ((RegistrationProvider) srv);
+                    regProv.register(internalProxyResponseListener, srv.hashCode(), fields);
+                }
+            }
+
+        } else {
+            throw new GMSException("Missing fields.", null, -1);
+        }
 
     }
+
+    @Override
+    public void loginWithCredentials(HTTPResponseListener httpResponseListener, int requestCode, CredentialAdapter credAdapter) throws GMSException {
+        if (getSupportedProviders().contains(credAdapter.getProvider())) {
+
+            MyHTTPResponseListener internalProxyResponseListener = new MyHTTPResponseListener(httpResponseListener, requestCode, authProvCount);
+
+            for (ServiceProvider srv : services.values()) {
+
+                if (srv instanceof AuthenticationProvider) {
+                    AuthenticationProvider regProv = ((AuthenticationProvider) srv);
+                    regProv.loginWithCredentials(internalProxyResponseListener, srv.hashCode(), credAdapter);
+                }
+            }
+        } else
+            throw new GMSException("Unsupported credential provider", null, -1);
+    }
+
 
     @Override
     public void setOnCredentialsRequiredListener(OnCredentialsRequiredListener listener) throws GMSException {
+        this.credListener = listener;
 
     }
 
-    @Override
-    public void setOnHttpResponseListener(HTTPResponseListener listener) {
-
-    }
-
-    @Override
-    public void login() throws GMSException {
-
-        HashMap<ServiceProvider,GMSException> failedList = new HashMap<>();
-
-        for (ServiceProvider srv : services.values())
-        {
-            try{
-                srv.login();
-            } catch (GMSException e){
-                failedList.put(srv,e);
-            }
-        }
-
-        //FIXME improve error message
-        if (failedList.size() > 0 && failedList.size() < services.size())
-            throw new GMSExceptionBuilder(null, context.getResources().getInteger(R.integer.gms_error_loginPartialFailure), "partialfailure" ).addExtra("failedList",failedList).build();
-        else if (failedList.size() == services.size())
-            throw new GMSExceptionBuilder(null, context.getResources().getInteger(R.integer.gms_error_loginFailure), "full failure" ).addExtra("failedList",failedList).build();
-    }
-
-    @Override
-    public void register(Map<String, String> fields) throws GMSException {
-
-        HashMap<ServiceProvider, GMSException> failedList = new HashMap<>();
-
-        for (ServiceProvider srv : services.values()) {
-            try {
-                srv.register(fields);
-            } catch (GMSException e) {
-                failedList.put(srv, e);
-            }
-        }
-
-        //FIXME improve error message
-        if (failedList.size() > 0 && failedList.size() < services.size())
-            throw new GMSExceptionBuilder(null, context.getResources().getInteger(R.integer.gms_error_loginPartialFailure), "partialfailure").addExtra("failedList", failedList).build();
-        else if (failedList.size() == services.size())
-            throw new GMSExceptionBuilder(null, context.getResources().getInteger(R.integer.gms_error_loginFailure), "full failure").addExtra("failedList", failedList).build();
-
-        //TODO: copy fields from services to local GMS service
-    }
 
     @Override
     public Set<String> getRequiredRegisterFields() {
         Set<String> result = new HashSet<>();
 
-        for (ServiceProvider srv : services.values())
-        {
+        for (ServiceProvider srv : services.values()) {
             if (srv instanceof RegistrationProvider)
-                result.addAll(((RegistrationProvider)srv).getRequiredRegisterFields());
+                result.addAll(((RegistrationProvider) srv).getRequiredRegisterFields());
         }
 
         return result;
@@ -152,27 +159,27 @@ public class GMS implements ServiceProvider,AuthenticationProvider, Registration
 
     @Override
     public Set<String> getUserFields() {
-        throw  new UnsupportedOperationException("not supported yet");
+        throw new UnsupportedOperationException("not supported yet");
     }
 
     @Override
     public boolean hasUserField(String field) {
-        throw  new UnsupportedOperationException("not supported yet");
+        throw new UnsupportedOperationException("not supported yet");
     }
 
     @Override
     public String getUserValue(String field) {
-        throw  new UnsupportedOperationException("not supported yet");
+        throw new UnsupportedOperationException("not supported yet");
     }
 
     @Override
     public boolean updateUserValue(String field, String value) throws GMSException {
-        throw  new UnsupportedOperationException("not supported yet");
+        throw new UnsupportedOperationException("not supported yet");
     }
 
     @Override
     public boolean updateUserValues(Map<String, String> map) throws GMSException {
-        throw  new UnsupportedOperationException("not supported yet");
+        throw new UnsupportedOperationException("not supported yet");
 
 //        HashMap<ServiceProvider,GMSException> failedList = new HashMap<>();
 
@@ -205,7 +212,7 @@ public class GMS implements ServiceProvider,AuthenticationProvider, Registration
 
 
     public LMSSession getLMSSession() throws GMSException {
-        LMSService lmsService = (LMSService)services.get(LMSService.class.getSimpleName());
+        LMSService lmsService = (LMSService) services.get(LMSService.class.getSimpleName());
         return lmsService.getLMSSession();
     }
 
@@ -215,21 +222,78 @@ public class GMS implements ServiceProvider,AuthenticationProvider, Registration
     }
 
 
-
     @Override
-    public boolean isLoggedIn() throws GMSException {
-        throw  new UnsupportedOperationException("not supported yet");
+    public void isLoggedIn(HTTPResponseListener httpResponseListener, int requestCode) throws GMSException {
+        MyHTTPResponseListener internalProxyResponseListener = new MyHTTPResponseListener(httpResponseListener, requestCode, authProvCount);
+
+        for (ServiceProvider srv : services.values()) {
+            if (srv instanceof AuthenticationProvider) {
+                AuthenticationProvider regProv = ((AuthenticationProvider) srv);
+                regProv.isLoggedIn(internalProxyResponseListener, regProv.hashCode());
+            }
+        }
     }
 
     @Override
-    public Set<String> getLoggedProviders() throws GMSException {
-        throw  new UnsupportedOperationException("not supported yet");
+    public void getLoggedProviders(HTTPResponseListener httpResponseListener) throws GMSException {
+        throw new UnsupportedOperationException("not supported yet");
     }
 
     @Override
     public Set<String> getSupportedProviders() {
-        throw  new UnsupportedOperationException("not supported yet");
+        Set<String> result = new HashSet<>();
+        boolean initial = true;
+        for (ServiceProvider srv : services.values()) {
+            if (srv instanceof AuthenticationProvider) {
+                AuthenticationProvider regProv = ((AuthenticationProvider) srv);
+
+                if (initial){
+                    initial = false;
+                    result.addAll(regProv.getSupportedProviders());
+                }else
+                    result.retainAll(regProv.getSupportedProviders());
+            }
+        }
+
+        return result;
     }
 
 
+    private class MyHTTPResponseListener implements HTTPResponseListener {
+
+        private HTTPResponseListener externalResponseListener;
+        private int externalRequestCode;
+        private AtomicInteger responseCount;
+        private int expectedResponses;
+        private Boolean answered;
+
+        public MyHTTPResponseListener(HTTPResponseListener externalResponseListener, int externalRequestCode, int expectedResponses) {
+            this.externalResponseListener = externalResponseListener;
+            this.externalRequestCode = externalRequestCode;
+            this.expectedResponses = expectedResponses;
+            this.answered = false;
+            this.responseCount = new AtomicInteger(0);
+        }
+
+        @Override
+        public void onResponse(int requestCode, boolean successful, HashMap<String, Object> data, Exception exception) {
+
+            if ((!successful || responseCount.incrementAndGet() == expectedResponses)){
+                //ensure only 1 response
+                synchronized (answered) {
+                    if (!answered){
+
+                        externalResponseListener.onResponse(externalRequestCode,successful, new HashMap<String, Object>(0), exception);
+
+                        answered = true;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onProgress(int requestCode, HTTPProgressStatus progressStatus, HashMap<String, Object> newdata) {
+
+        }
+    }
 }

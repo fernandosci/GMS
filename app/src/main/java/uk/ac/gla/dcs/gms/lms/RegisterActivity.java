@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -14,11 +13,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import uk.ac.gla.dcs.gms.Utils;
-import uk.ac.gla.dcs.gms.api.http.APIHttpJSONResponse;
-import uk.ac.gla.dcs.gms.api.http.HTTPCustomException;
-import uk.ac.gla.dcs.gms.api.lms.LMSAuthenticationRequest;
-import uk.ac.gla.dcs.gms.api.Security;
+import uk.ac.gla.dcs.gms.api.GMS;
+import uk.ac.gla.dcs.gms.api.GMSException;
+import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
+import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 import uk.ac.gla.dcs.gms.api.validation.RegisterValidation;
 
 @SuppressWarnings("deprecation")
@@ -77,49 +79,25 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
         if (v.getId() == R.id.register_btn) {
 
             if (validate()) {
-                //send details to server
-                LMSAuthenticationRequest request = new LMSAuthenticationRequest(getApplicationContext(), LMSAuthenticationRequest.REGISTER) {
-                    @Override
-                    protected void onPostExecute(APIHttpJSONResponse apiResponse) {
-
-                        try {
-                            String tokenFromResponse = getTokenFromResponse(apiResponse);
-                            Security.setToken(getApplicationContext(), tokenFromResponse);
-                            Bundle bundle = new Bundle();
-                            bundle.putString(KEY_EMAIL, editTxtEmail.getText().toString());
-                            Intent intent = new Intent();
-                            intent.putExtras(bundle);
-                            setResult(Activity.RESULT_OK, intent);
-                            finish();
-
-                        } catch (HTTPCustomException e) {
-                            Log.e(TAG, e.getMessage());
-                            Utils.shortToast(getApplicationContext(), e.getMessage());
-                        } catch (uk.ac.gla.dcs.gms.api.SecurityException e) {
-                            e.printStackTrace();
-                            Utils.shortToast(getApplicationContext(), "Security failure.");
-                        } finally {
-                            btnRegister.setEnabled(true);
-                        }
-                    }
-                };
                 btnRegister.setEnabled(false);
-                // (username + ":" + password + ":" + email + ":" + answer + ":" + question)
-                request.execute(
-                        editTxtEmail.getText().toString(),
-                        editTxtPassword.getText().toString(),
-                        editTxtEmail.getText().toString(),
-                        editTxtAnswer.getText().toString(),
-                        "question"                  //fixme
-                );
-//                request.execute(
-//                        editTxtEmail.getText().toString(),
-//                        editTxtPassword.getText().toString(),
-//                        editTxtEmail.getText().toString(),
-//                        editTxtAnswer.getText().toString(),
-//                        tViewSecretQuestion.getText().toString()
-//                );
-                //request.execute(getString(R.string.debug_username), getString(R.string.debug_password), "email", "answer", "question");
+
+
+                Map<String, String> user = new HashMap<>();
+                user.put("username",editTxtEmail.getText().toString());
+                user.put("password",editTxtPassword.getText().toString());
+                user.put("email",editTxtEmail.getText().toString());
+                user.put("answer",editTxtAnswer.getText().toString());
+                user.put("question", tViewSecretQuestion.getText().toString());
+
+
+                try {
+                    GMS.getInstance().register(new LocalHTTPResponseListener(),0, user);
+                } catch (GMSException e) {
+                    e.printStackTrace();
+                    btnRegister.setEnabled(true);
+                    Utils.shortToast(this,e.getMessage());
+                }
+
             } else {
                 Utils.shortToast(getApplicationContext(), "Please fill all missing fields.");
             }
@@ -224,4 +202,39 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
     }
 
 
+    private class LocalHTTPResponseListener implements HTTPResponseListener {
+        @Override
+        public void onResponse(int requestCode, boolean successful, HashMap<String, Object> data, Exception exception) {
+
+            if (successful){
+                Bundle bundle = new Bundle();
+                bundle.putString(KEY_EMAIL, editTxtEmail.getText().toString());
+                Intent intent = new Intent();
+                intent.putExtras(bundle);
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+            }
+            else{
+
+                if (data.containsKey(getString(R.string.lms_api_StandardFieldErrorsKey)))
+                {
+                    String[] errors = (String[]) data.get(getString(R.string.lms_api_StandardFieldErrorsKey));
+
+                    Utils.shortToast(getApplicationContext(),errors[0]);
+                }else if (exception!= null) {
+                    exception.printStackTrace();
+
+                    Utils.shortToast(getApplicationContext(), exception.getMessage());
+                }
+
+                btnRegister.setEnabled(true);
+            }
+
+        }
+
+        @Override
+        public void onProgress(int requestCode, HTTPProgressStatus progressStatus, HashMap<String, Object> newdata) {
+
+        }
+    }
 }

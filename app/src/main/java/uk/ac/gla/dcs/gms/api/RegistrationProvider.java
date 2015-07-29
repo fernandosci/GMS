@@ -3,14 +3,14 @@ package uk.ac.gla.dcs.gms.api;
 import java.util.Map;
 import java.util.Set;
 
-import uk.ac.gla.dcs.gms.api.http.HTTPResponseCaller;
+import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 
 /**
  * Created by ito on 23/07/2015.
  */
-public interface RegistrationProvider extends HTTPResponseCaller{
+public interface RegistrationProvider{
 
-    void register(Map<String,String> fields) throws GMSException;
+    void register(HTTPResponseListener httpResponseListener, int requestCode, Map<String, String> fields) throws GMSException;
 
     Set<String> getRequiredRegisterFields();
 

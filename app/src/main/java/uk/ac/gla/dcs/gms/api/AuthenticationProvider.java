@@ -2,17 +2,17 @@ package uk.ac.gla.dcs.gms.api;
 
 import java.util.Set;
 
-import uk.ac.gla.dcs.gms.api.http.HTTPResponseCaller;
+import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 
-public interface AuthenticationProvider extends HTTPResponseCaller{
+public interface AuthenticationProvider{
 
-    void loginWithCredentials(CredentialContainer container) throws GMSException;
+    void loginWithCredentials(HTTPResponseListener httpResponseListener, int requestCode, CredentialAdapter credAdapter) throws GMSException;
 
     void setOnCredentialsRequiredListener(OnCredentialsRequiredListener listener) throws GMSException;
 
-    boolean isLoggedIn() throws GMSException;
+    void isLoggedIn(HTTPResponseListener httpResponseListener, int requestCode) throws GMSException;
 
-    Set<String> getLoggedProviders() throws GMSException;
+    void getLoggedProviders(HTTPResponseListener httpResponseListener) throws GMSException;
 
     Set<String> getSupportedProviders();
 }
