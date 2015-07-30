@@ -1,7 +1,7 @@
 package uk.ac.gla.dcs.gms.main;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -9,14 +9,15 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import uk.ac.gla.dcs.gms.api.GMS;
+import uk.ac.gla.dcs.gms.api.GMSException;
+import uk.ac.gla.dcs.gms.api.lms.LMSSession;
 import uk.ac.gla.dcs.gms.lms.CustomMapFragment;
 import uk.ac.gla.dcs.gms.lms.R;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, GMSMainFragmentCallbacks {
-
-    public static Activity instance = null;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -29,6 +30,7 @@ public class MainActivity extends ActionBarActivity
     private CharSequence mTitle;
 
     public static FragmentManager fragmentManager;
+    private LMSSession lmsSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +47,16 @@ public class MainActivity extends ActionBarActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
 
+        try {
+            lmsSession = GMS.getInstance().getLMSSession();
+        } catch (GMSException e) {
+            //todo improve error handling
+            e.printStackTrace();
+            lmsSession = null;
+        }
+
         //might remove these lines
         fragmentManager = getSupportFragmentManager();
-        instance = this;
     }
 
     @Override
@@ -61,12 +70,15 @@ public class MainActivity extends ActionBarActivity
 
         mTitle = titles[position];
 
-//        switch (position) {
-//            case 0:
-//                fragmentManager.beginTransaction()
-//                        .replace(R.id.container, PlaceholderFragment.newInstance(position))
-//                        .commit();
-//                break;
+        switch (position) {
+            case 0:
+                if (lmsSession != null) {
+                    Fragment fragment = (Fragment) LMSDailySummary.newInstance("0", lmsSession);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, fragment)
+                                    .commit();
+                }
+                break;
 //            case 1:
 //                fragmentManager.beginTransaction()
 //                        .replace(R.id.container, PlaceholderFragment.newInstance(position))
@@ -110,7 +122,7 @@ public class MainActivity extends ActionBarActivity
 //                        .replace(R.id.container, PlaceholderFragment.newInstance(position))
 //                        .commit();
 //                break;
-//        }
+        }
     }
 
     @Override

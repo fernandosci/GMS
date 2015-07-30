@@ -1,5 +1,7 @@
 package uk.ac.gla.dcs.gms.main;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Pair;
@@ -12,34 +14,54 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
+import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
+import uk.ac.gla.dcs.gms.api.lms.LMSImageRequestParamBuilder;
+import uk.ac.gla.dcs.gms.api.lms.LMSSession;
 import uk.ac.gla.dcs.gms.lms.ImageScrollerAdapter;
 import uk.ac.gla.dcs.gms.lms.R;
+import uk.ac.gla.dcs.gms.lms.SingleViewActivity;
+import uk.ac.gla.dcs.gms.utils.ErrorsUtils;
 
 /**
  * Created by ito.
  */
-public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnScrollListener{
+public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnScrollListener {
 
     private ListView listView;
     private ProgressBar progressBar;
     private ImageScrollerAdapter adapter;
     private Handler mHandler;
+    private ArrayList<Pair<String, String>> imgList;
+    private LocalListener localListener;
+    private boolean hasCallback;
+    private LMSSession session;
+    private Context context;
+    private int skip;
 
     public LMSDailySummary() {
     }
 
-    public static LMSDailySummary newInstance(String section){
+    public static LMSDailySummary newInstance(String section, LMSSession session) {
         LMSDailySummary dailySummary = new LMSDailySummary();
         Bundle args = new Bundle();
         args.putString(ARG_SECTION, section);
         dailySummary.setArguments(args);
+        dailySummary.session = session;
         return dailySummary;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        localListener = new LocalListener();
+        imgList = new ArrayList<>();
+        hasCallback = false;
+        session = null;
+        skip = 0;
+        context = inflater.getContext();
 
         View rootView;
 
@@ -56,32 +78,13 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
         listView = (ListView) rootView.findViewById(R.id.listView);
         listView.addFooterView(footer);
 
-        //Adding images to the list view
-        Integer coin = R.drawable.bonus_coin;
-        Integer tree = R.drawable.bonus_tree;
-
-        Pair<Integer, Integer> p1 = new Pair<>(coin, coin);
-        Pair<Integer, Integer> p2 = new Pair<>(coin, tree);
-        Pair<Integer, Integer> p3 = new Pair<>(tree, coin);
-        Pair<Integer, Integer> p4 = new Pair<>(tree, tree);
-
-        ArrayList<Pair> vet = new ArrayList<>();
-
-        for (int i=0; i<15; i++) {
-            vet.add(new Pair<>(p1.first, p1.second));
-            vet.add(new Pair<>(p2.first, p2.second));
-            vet.add(new Pair<>(p3.first, p3.second));
-            vet.add(new Pair<>(p4.first, p4.second));
-        }
-
-        adapter = new ImageScrollerAdapter(inflater.getContext(), R.layout.row_layout, vet, 10, 5);
+        adapter = new ImageScrollerAdapter(inflater.getContext(), R.layout.row_layout, imgList, localListener);
         listView.setAdapter(adapter);
         listView.setOnScrollListener(this); //listen for a scroll movement to the bottom
-        progressBar.setVisibility((20 < vet.size()) ? View.VISIBLE : View.GONE);
 
-
-
-
+        LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder();
+        builder.setLimit(10).setPersonal(true);
+        session.getImages(localListener, 0, builder.toString());
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -98,18 +101,64 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if(firstVisibleItem + visibleItemCount == totalItemCount && !adapter.endReached() && !hasCallback){ //check if we've reached the bottom
-            mHandler.postDelayed(showMore, 300);
+        // Sample calculation to determine if the last
+        // item is fully visible.
+        final int lastItem = firstVisibleItem + visibleItemCount;
+        if (lastItem == totalItemCount && !hasCallback) {
+            mHandler.postDelayed(localListener, 300);
             hasCallback = true;
         }
 
     }
-    private boolean hasCallback;
-    private Runnable showMore = new Runnable(){
-        public void run(){
-            boolean noMoreToShow = adapter.showMore(); //show more views and find out if
-            progressBar.setVisibility(noMoreToShow? View.GONE : View.VISIBLE);
+
+    private class LocalListener implements View.OnClickListener, HTTPResponseListener, Runnable {
+        @Override
+        public void onClick(View v) {
+
+            Bundle bundle = new Bundle();
+            bundle.putString(ImageScrollerAdapter.ARG_IMG_URL, (String) v.getTag());
+            Intent intent = new Intent(context, SingleViewActivity.class);
+            intent.putExtras(bundle);
+            context.startActivity(intent);
+        }
+
+        @Override
+        public void onResponse(int requestCode, boolean successful, HashMap<String, Object> data, Exception exception) {
+
+            if (successful) {
+
+                ArrayList<String> img_urls = (ArrayList<String>) data.get("img_urls");
+                Pair<String, String> pair;
+
+                for (int c = 0; c < img_urls.size(); c+=2) {
+
+                    if (c < img_urls.size() - 1)
+                        pair = new Pair<>(img_urls.get(c), img_urls.get(c + 1));
+                    else
+                        pair = new Pair<>(img_urls.get(c), "");
+
+                    imgList.add(pair);
+                }
+
+                progressBar.setVisibility((20 < imgList.size()) ? View.VISIBLE : View.GONE);
+                adapter.notifyDataSetChanged();
+            } else {
+                ErrorsUtils.processHttpResponseError(context, data, exception);
+            }
+        }
+
+        @Override
+        public void onProgress(int requestCode, HTTPProgressStatus progressStatus, HashMap<String, Object> newdata) {
+
+        }
+
+        @Override
+        public void run() {
+            skip++;
+            LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder();
+            builder.setLimit(10).setPersonal(true).setSkip(skip);
+            session.getImages(localListener, 1, builder.toString());
             hasCallback = false;
         }
-    };
+    }
 }

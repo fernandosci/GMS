@@ -1,7 +1,7 @@
 package uk.ac.gla.dcs.gms.main;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 
 /**
  * Created by ito.
