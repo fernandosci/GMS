@@ -93,7 +93,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             } else if (editTxtPassword.getText().toString().length() == 0) {
                 Utils.shortToast(getApplicationContext(), "Please input your password.");
             } else {
-                    btnLogin.setEnabled(false);
+                btnLogin.setEnabled(false);
                 try {
                     GMS.getInstance().loginWithCredentials(httpResponseListener, 0, CredentialAdapter.getLocalCredentialAdapter(editTxtEmail.getText().toString(), editTxtPassword.getText().toString()));
                 } catch (GMSException e) {
@@ -114,12 +114,28 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     private class LocalLoginResponseListener implements HTTPResponseListener {
         @Override
         public void onResponse(int requestCode, boolean successful, HashMap<String, Object> data, Exception exception) {
+            if (btnLogin != null) {
+                btnLogin.setEnabled(true);
+            }
+
             if (successful)
                 login();
-            else if (requestCode == STARTUP){
-//                init();       //dont need.. it would need if the initialization code were not (always) initialized on onCreate
-            }else
-                btnLogin.setEnabled(true);
+            else {
+                {
+                    if (requestCode != STARTUP) {
+                        if (data.containsKey(getString(R.string.lms_api_StandardFieldErrorsKey)))
+                        {
+                            String[] errors = (String[]) data.get(getString(R.string.lms_api_StandardFieldErrorsKey));
+
+                            Utils.shortToast(getApplicationContext(),errors[0]);
+                        }else if (exception!= null) {
+                            exception.printStackTrace();
+
+                            Utils.shortToast(getApplicationContext(), exception.getMessage());
+                        }
+                    }
+                }
+            }
         }
 
         @Override
