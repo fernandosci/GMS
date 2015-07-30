@@ -7,7 +7,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.HashMap;
@@ -35,6 +38,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
     private Button btnRegister;
     private Button btnLogin;
+    ProgressBar progressBar;
 
 
     @Override
@@ -60,6 +64,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         imgViewLogo = (ImageView) findViewById(R.id.login_iview_logo);
         btnRegister = (Button) findViewById(R.id.login_btn_register);
         btnLogin = (Button) findViewById(R.id.login_btn);
+        progressBar = (ProgressBar) findViewById(R.id.login_pbar);
 
         imgViewLogo.setImageResource(R.drawable.bonus_coin);
 
@@ -94,6 +99,8 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                 Utils.shortToast(getApplicationContext(), "Please input your password.");
             } else {
                 btnLogin.setEnabled(false);
+                progressBar.setVisibility(View.VISIBLE);
+
                 try {
                     GMS.getInstance().loginWithCredentials(httpResponseListener, 0, CredentialAdapter.getLocalCredentialAdapter(editTxtEmail.getText().toString(), editTxtPassword.getText().toString()));
                 } catch (GMSException e) {
@@ -132,6 +139,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                             exception.printStackTrace();
 
                             Utils.shortToast(getApplicationContext(), exception.getMessage());
+                            progressBar.setVisibility(View.GONE);
                         }
                     }
                 }
