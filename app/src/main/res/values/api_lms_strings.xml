@@ -30,6 +30,6 @@
     <string name="lms_api_StandardFieldStatusKey">status</string>
 
     <string name="debug_username">debug12345</string>
-    <string name="debug_password">abcdABCD1234!@#$</string>
+    <string name="debug_password">abcdABCD1234!#$</string>
 
 </resources>

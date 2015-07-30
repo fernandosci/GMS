@@ -2,11 +2,12 @@ package uk.ac.gla.dcs.gms.api;
 
 import android.content.Context;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import uk.ac.gla.dcs.gms.utils.FileUtils;
 
-public class GMSUser {
+public class GMSUser implements Serializable{
     protected String service;
 
     protected HashMap<String, String> user;

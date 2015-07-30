@@ -283,7 +283,7 @@ public class GMS implements ServiceProvider, AuthenticationProvider, Registratio
                 synchronized (answered) {
                     if (!answered){
 
-                        externalResponseListener.onResponse(externalRequestCode,successful, new HashMap<String, Object>(0), exception);
+                        externalResponseListener.onResponse(externalRequestCode,successful, data, exception);
 
                         answered = true;
                     }

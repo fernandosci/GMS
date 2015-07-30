@@ -42,6 +42,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.login);
+        init();
 
         httpResponseListener = new LocalLoginResponseListener();
 
@@ -49,7 +50,6 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             GMS.getInstance().isLoggedIn(httpResponseListener, STARTUP);
         } catch (GMSException e) {
             e.printStackTrace();
-            init();
         }
     }
 
@@ -107,6 +107,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     }
 
     private void login() {
+        btnLogin.setEnabled(true);
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
     }
 
@@ -116,7 +117,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             if (successful)
                 login();
             else if (requestCode == STARTUP){
-                init();
+//                init();       //dont need.. it would need if the initialization code were not (always) initialized on onCreate
             }else
                 btnLogin.setEnabled(true);
         }

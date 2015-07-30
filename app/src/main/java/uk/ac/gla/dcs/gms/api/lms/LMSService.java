@@ -22,36 +22,29 @@ import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 
 public class LMSService implements ServiceProvider, AuthenticationProvider, RegistrationProvider {
 
-    private static final String TAG = "LMSService";
-
     public static final String SERVICENAME = "LMS Service";
-    private static final String USERFILENAME = "lmsUser";
-
     public static final int OPERATION_REGISTER = 0;
     public static final int OPERATION_LOCAL = 1;
     public static final int OPERATION_FACEBOOK = 2;
-
-    private static final String[] supportedAuthProviders = { "local"};
-    private static final String[] requiredRegisterFields = { "username", "password", "email", "answer", "question"};
+    private static final String TAG = "LMSService";
+    private static final String USERFILENAME = "lmsUser";
+    private static final String[] supportedAuthProviders = {"local"};
+    private static final String[] requiredRegisterFields = {"username", "password", "email", "answer", "question"};
 
     private Context context;
     private OnCredentialsRequiredListener credListener;
-    private HTTPResponseListener responseListener;
-    private HTTPResponseListener proxyResponseListener;
 
-    private GMSUser gmsUser;
+    private LMSUser gmsUser;
 
 
     public LMSService(Context context) {
         this.context = context.getApplicationContext();
         this.credListener = null;
-        this.responseListener = null;
-        this.proxyResponseListener = new LocalProxyResponseListener();
 
         try {
-            gmsUser = GMSUser.fromFile(context, USERFILENAME);
+            gmsUser = (LMSUser) GMSUser.fromFile(context, USERFILENAME);
         } catch (Exception e) {
-           gmsUser = new GMSUser(SERVICENAME);
+            gmsUser = new LMSUser();
         }
     }
 
@@ -60,17 +53,17 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         //first, check for all fields
 
         boolean checkResult = true;
-        for (String str : requiredRegisterFields){
-            if (!fields.containsKey(str)){
+        for (String str : requiredRegisterFields) {
+            if (!fields.containsKey(str)) {
                 checkResult = false;
                 break;
             }
         }
 
-        if (checkResult){
-            getToken(httpResponseListener, OPERATION_REGISTER,fields);
-        }else{
-            throw new GMSException("Missing fields.",null,-1);
+        if (checkResult) {
+            getToken(httpResponseListener, OPERATION_REGISTER, fields);
+        } else {
+            throw new GMSException("Missing fields.", null, -1);
         }
 
     }
@@ -83,22 +76,25 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
                 getToken(httpResponseListener, OPERATION_LOCAL, credAdapter.getMap());
             else
                 throw new GMSException("Missing fields.", null, -1);
-        }else{
-            throw  new UnsupportedOperationException("not supported yet");
+        } else {
+            throw new UnsupportedOperationException("not supported yet");
         }
     }
 
-    private void getToken(HTTPResponseListener httpResponseListener, int operation, Map<String, String> data){
+    private void getToken(HTTPResponseListener httpResponseListener, int operation, Map<String, String> data) {
 
-        LMSSessionImp tmpSession = new LMSSessionImp(context,this);
+        LMSSessionImp tmpSession = new LMSSessionImp(context, this);
 
-        switch (operation){
-            case OPERATION_REGISTER:{
-                tmpSession.register(httpResponseListener, OPERATION_REGISTER, data.get("username"), data.get("password"), data.get("email"), data.get("answer"), data.get("question"));
-            }break;
+        HTTPResponseListener proxyListener = new LocalProxyResponseListener(httpResponseListener);
+        switch (operation) {
+            case OPERATION_REGISTER: {
+                tmpSession.register(proxyListener, OPERATION_REGISTER, data.get("username"), data.get("password"), data.get("email"), data.get("answer"), data.get("question"));
+            }
+            break;
             case OPERATION_LOCAL: {
-                tmpSession.login(httpResponseListener, OPERATION_LOCAL, data.get("username"), data.get("password"));
-            }break;
+                tmpSession.login(proxyListener, OPERATION_LOCAL, data.get("username"), data.get("password"));
+            }
+            break;
             default:
                 throw new UnsupportedOperationException();
         }
@@ -111,8 +107,8 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
 
     @Override
     public void isLoggedIn(HTTPResponseListener httpResponseListener, int requestCode) {
-        //FIXME think in a better way to do it
-        httpResponseListener.onResponse(requestCode,gmsUser.getUser().containsKey("token"), new HashMap<String, Object>(0), null);
+        //FIXME think in a better way to do it, check if token is valid
+        httpResponseListener.onResponse(requestCode, !gmsUser.getToken().isEmpty(), new HashMap<String, Object>(0), null);
     }
 
     @Override
@@ -149,7 +145,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     public boolean updateUserValue(String field, String value) throws GMSException {
         HashMap<String, String> tmp = new HashMap<>();
 
-        tmp.put(field,value);
+        tmp.put(field, value);
         return updateUserValues(tmp);
     }
 
@@ -173,10 +169,10 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         throw new UnsupportedOperationException();
     }
 
-    public LMSSession getLMSSession() throws GMSException{
-        if (gmsUser.getUser().containsKey("token")) {
-            return new LMSSessionImp(context, this, gmsUser.getUser().get("token"));
-        }else
+    public LMSSession getLMSSession() throws GMSException {
+        if (gmsUser.getToken() != null) {
+            return new LMSSessionImp(context, this, gmsUser.getToken());
+        } else
             throw new GMSException("Not logged in", null, -1);
     }
 
@@ -186,17 +182,43 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         return SERVICENAME;
     }
 
+    protected void tokenExpired(LMSSessionImp sessionImp) {
+        //TODO - try to renew token
+        //TODO - if cant cal loncredentialsRequired
+
+        if (credListener != null) {
+            credListener.onCredentialsRequired(this, getSupportedProviders());
+        }
+
+    }
+
+
     private class LocalProxyResponseListener implements HTTPResponseListener {
+        private HTTPResponseListener responseListener;
+
+        public LocalProxyResponseListener() {
+            this.responseListener = null;
+        }
+
+        public LocalProxyResponseListener(HTTPResponseListener responseListener) {
+            this.responseListener = responseListener;
+        }
+
         @Override
         public void onResponse(int requestCode, boolean successful, HashMap<String, Object> data, Exception exception) {
 
             if (requestCode == OPERATION_REGISTER || requestCode == OPERATION_LOCAL) {
 
                 if (successful) {
-                    gmsUser.getUser().put("token", data.get("token").toString());
+                    gmsUser.setToken((String) data.get("token"));
+                    try {
+                        gmsUser.saveToFile(context,USERFILENAME);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }else
-                exception =  new UnsupportedOperationException();
+            } else
+                exception = new UnsupportedOperationException();
 
             if (responseListener != null)
                 responseListener.onResponse(requestCode, successful, data, exception);

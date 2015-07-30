@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.GMSExceptionBuilder;
+import uk.ac.gla.dcs.gms.api.OnCredentialsRequiredListener;
 import uk.ac.gla.dcs.gms.api.http.APIHttpJSONResponse;
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
@@ -47,9 +48,12 @@ public class LMSSessionImp implements LMSSession {
     private boolean expired;
     private int timeout;
 
+    private OnCredentialsRequiredListener credentialsRequiredListener;
+
     public LMSSessionImp(Context context, LMSService lmsService) {
         this.lmsService = lmsService;
         this.context = context.getApplicationContext();
+        this.credentialsRequiredListener = null;
         token = "";
         expired = false;
         timeout = 5000;
@@ -61,6 +65,25 @@ public class LMSSessionImp implements LMSSession {
         this.token = token;
         this.expired = false;
         timeout = 5000;
+    }
+
+    private static Object getField(APIHttpJSONResponse response, String fieldName) throws GMSException {
+        try {
+            if (response.getJsonResponse() != null) {
+                if (response.getJsonResponse().has(fieldName)) {
+                    return response.getJsonResponse().get(fieldName);
+                } else
+                    return null;
+            } else {
+                Log.w(TAG, "Null JsonResponse.");
+                return null;
+            }
+        } catch (JSONException e) {
+            //should never reach here...
+            Log.w(TAG, "Failed to get " + fieldName + "field from JSON Object.");
+            e.printStackTrace();
+            throw new GMSException("Failed to get " + fieldName + "field from JSON Object.", e, -1);//FIXME error code
+        }
     }
 
     protected Resources getResources() {
@@ -75,12 +98,10 @@ public class LMSSessionImp implements LMSSession {
         requestWithAuthorization(listener, PROCESSCODE_REGISTER, requestCode, getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointRegister), ""), username + ":" + password + ":" + email + ":" + answer + ":" + question);
     }
 
-
     public void getUserDetails(HTTPResponseListener listener, int requestCode) {
         HttpURLConnection urlConnection = getUrlConnection(listener, requestCode, getResources().getString(R.string.lms_endpointUser), "");
         requestWithCookie(listener, PROCESSCODE_USERDETAIL, requestCode, urlConnection, "GET");
     }
-
 
     @Override
     public void getStats(HTTPResponseListener listener, int requestCode, String urlParameters) {
@@ -112,13 +133,12 @@ public class LMSSessionImp implements LMSSession {
 
     @Override
     public boolean isExpired() {
-        return token.isEmpty() ||  expired;
+        return token.isEmpty() || expired;
     }
 
     public void setExpired(boolean expired) {
         this.expired = expired;
     }
-
 
     private HttpURLConnection getUrlConnection(HTTPResponseListener listener, int requestCode, String complement, String parameters) {
         try {
@@ -135,10 +155,6 @@ public class LMSSessionImp implements LMSSession {
     private void requestWithAuthorization(HTTPResponseListener listener, int processCode, int requestCode, HttpURLConnection urlConnection, String authString) {
         if (urlConnection == null)
             return;
-
-        byte[] authEncBytes = Base64.encode(authString.getBytes(), Base64.DEFAULT);
-        String authStringEnc = new String(authEncBytes);
-
         try {
             urlConnection.setRequestMethod("POST");
         } catch (ProtocolException e) {
@@ -150,8 +166,8 @@ public class LMSSessionImp implements LMSSession {
         }
         urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
         urlConnection.setConnectTimeout(timeout);
-
-        urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+        String basicAuth = "Basic " + new String(Base64.encode(authString.getBytes(), Base64.NO_WRAP | Base64.URL_SAFE));
+        urlConnection.setRequestProperty("Authorization", basicAuth);
 
         LMSHttpJsonRequest request = new LMSHttpJsonRequest(listener, requestCode, processCode);
         request.execute(urlConnection);
@@ -179,12 +195,11 @@ public class LMSSessionImp implements LMSSession {
         request.execute(urlConnection);
     }
 
-
     private class LMSHttpJsonRequest extends AsyncTask<HttpURLConnection, HTTPProgressStatus, APIHttpJSONResponse> {
         private static final String TAG = "LMSHttpRequest";
+        private final HTTPResponseListener httpResponseListener;
         private int requestCode;
         private int processCode;
-        private final HTTPResponseListener httpResponseListener;
 
         public LMSHttpJsonRequest(HTTPResponseListener httpResponseListener, int requestCode, int processCode) {
             this.requestCode = requestCode;
@@ -276,13 +291,17 @@ public class LMSSessionImp implements LMSSession {
                 HashMap<String, Object> data = null;
                 try {
                     data = processResponse(processCode, status, errorMessages, dataObj, response);
-                    httpResponseListener.onResponse(requestCode, errorMessages != null, data, null);
-                    //success!
-                    return;
+
                 } catch (Exception e) {
                     Log.e(TAG, "Error processing data from json content.");
                     e.printStackTrace();
                     exceptionBuilder = new GMSExceptionBuilder(e, -1, "Error processing data from json content.");
+                }
+
+                if (exceptionBuilder == null) {
+                    //success!
+                    httpResponseListener.onResponse(requestCode, errorMessages == null, data, null);
+                    return;
                 }
             }
             //here there was an exception, forward it...
@@ -304,34 +323,34 @@ public class LMSSessionImp implements LMSSession {
 
             if (errorMessages != null && errorMessages.length > 0)
 
-                data.put(getResources().getString(R.string.lms_api_StandardFieldErrorsKey), status);
+                data.put(getResources().getString(R.string.lms_api_StandardFieldErrorsKey), errorMessages);
 
             else {
 
                 switch (processCode) {
                     case PROCESSCODE_LOGIN:
                     case PROCESSCODE_REGISTER: {
-                        processAuthentication(data,dataObj);
+                        processAuthentication(data, dataObj);
                     }
                     break;
                     case PROCESSCODE_IMAGES: {
-                        processGetImages(data,dataObj);
+                        processGetImages(data, dataObj);
                     }
                     break;
                     case PROCESSCODE_STATS: {
-                        processGetStats(data,dataObj);
+                        processGetStats(data, dataObj);
                     }
                     break;
                     case PROCESSCODE_TRAILS: {
-                        processGetTrails(data,dataObj);
+                        processGetTrails(data, dataObj);
                     }
                     break;
                     case PROCESSCODE_USERDETAIL: {
-                        processUserInfo(data,dataObj);
+                        processUserInfo(data, dataObj);
                     }
                     break;
                     case PROCESSCODE_VIDEOS: {
-                        processGetVideos(data,dataObj);
+                        processGetVideos(data, dataObj);
                     }
                     break;
                     default: {
@@ -342,7 +361,7 @@ public class LMSSessionImp implements LMSSession {
             return data;
         }
 
-        private void processUserInfo(HashMap<String, Object> data, Object dataObj)throws Exception {
+        private void processUserInfo(HashMap<String, Object> data, Object dataObj) throws Exception {
             try {
                 if (dataObj instanceof JSONObject) {
                     JSONObject objUser = (JSONObject) dataObj;
@@ -379,7 +398,7 @@ public class LMSSessionImp implements LMSSession {
                 for (int c = 0; c < jarray.length(); c++) {
                     try {
                         JSONObject o = (JSONObject) jarray.get(c);
-                        urls.add(((String) o.get("url")).replace("..",getResources().getString(R.string.lms_httpUrl)));
+                        urls.add(((String) o.get("url")).replace("..", getResources().getString(R.string.lms_httpUrl)));
                     } catch (JSONException e) {
                         Log.e(TAG, "Error processing images urls from json content.");
                         e.printStackTrace();
@@ -405,25 +424,6 @@ public class LMSSessionImp implements LMSSession {
         }
 
 
-    }
-
-    private static Object getField(APIHttpJSONResponse response, String fieldName) throws GMSException {
-        try {
-            if (response.getJsonResponse() != null) {
-                if (response.getJsonResponse().has(fieldName)) {
-                    return response.getJsonResponse().get(fieldName);
-                } else
-                    return null;
-            } else {
-                Log.w(TAG, "Null JsonResponse.");
-                return null;
-            }
-        } catch (JSONException e) {
-            //should never reach here...
-            Log.w(TAG, "Failed to get " + fieldName + "field from JSON Object.");
-            e.printStackTrace();
-            throw new GMSException("Failed to get " + fieldName + "field from JSON Object.", e, -1);//FIXME error code
-        }
     }
 
 }

@@ -21,6 +21,9 @@ public class LMSUser extends GMSUser{
     }
 
     public String getId() {
+        if (user.get("id") == null)
+            return "";
+        else
         return user.get("id");
     }
 
@@ -29,7 +32,10 @@ public class LMSUser extends GMSUser{
     }
 
     public String getUsername() {
-        return user.get("username");
+        if (user.get("username") == null)
+            return "";
+        else
+            return user.get("username");
     }
 
     public void setUsername(String username) {
@@ -37,15 +43,24 @@ public class LMSUser extends GMSUser{
     }
 
     public String getEmail() {
-        return user.get("email");
+        if (user.get("email") == null)
+            return "";
+        else
+            return user.get("email");
     }
 
     public void setEmail(String email) {
         user.put("email",email);
     }
 
-    public boolean isUploadAsPrivate(){
-        return Boolean.parseBoolean(user.get("uploadAsPrivate"));
+    public Boolean isUploadAsPrivate(){
+
+        String uploadAsPrivate = user.get("uploadAsPrivate");
+        if (uploadAsPrivate != null) {
+            return Boolean.parseBoolean(uploadAsPrivate);
+        }
+       else
+            return null;
     }
 
     public void setUploadAsPrivate(boolean uploadAsPrivate) {
@@ -53,7 +68,10 @@ public class LMSUser extends GMSUser{
     }
 
     public String getToken() {
-        return user.get("token");
+        if (user.get("token") == null)
+            return "";
+        else
+            return user.get("token");
     }
 
     public void setToken(String token) {
@@ -61,7 +79,10 @@ public class LMSUser extends GMSUser{
     }
 
     public String getTokenUpdate() {
-        return user.get("tokenUpdate");
+        if (user.get("tokenUpdate") == null)
+            return "";
+        else
+            return user.get("tokenUpdate");
     }
 
     public void setTokenUpdate(String tokenUpdate) {
@@ -69,7 +90,10 @@ public class LMSUser extends GMSUser{
     }
 
     public String getQuestion() {
-        return user.get("question");
+        if (user.get("question") == null)
+            return "";
+        else
+            return user.get("question");
     }
 
     public void setQuestion(String question) {
