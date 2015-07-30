@@ -22,7 +22,7 @@
     <statePointEntry>
       <state      
         class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
-        className = "uk.ac.gla.dcs.gms.lms.MainActivity"/>
+        className = "uk.ac.gla.dcs.gms.main.MainActivity"/>
       <point      
         x = "84"      
         y = "236"/>

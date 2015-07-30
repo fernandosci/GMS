@@ -18,6 +18,7 @@ import uk.ac.gla.dcs.gms.api.GMS;
 import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
+import uk.ac.gla.dcs.gms.main.MainActivity;
 
 @SuppressWarnings("deprecation")
 public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
@@ -41,7 +42,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.login);
+        setContentView(R.layout.mainf_login);
         init();
 
         httpResponseListener = new LocalLoginResponseListener();
@@ -101,7 +102,6 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                     Utils.shortToast(this, e.getMessage());
                 }
 
-//            APIHandler.login(request, getResources().getString(R.string.debug_username), getResources().getString(R.string.debug_password)); //debug
             }
         }
     }

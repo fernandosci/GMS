@@ -16,7 +16,7 @@ public class SingleViewActivity extends ActionBarActivity implements View.OnClic
 
         Bundle bundle = getIntent().getExtras();
 
-        ((ImageView)findViewById(R.id.singleview_iview)).setImageResource(bundle.getInt(ImageScroller.IMG_ID));
+        ((ImageView)findViewById(R.id.singleview_iview)).setImageResource(bundle.getInt(ImageScrollerAdapter.ARG_IMG_URL));
         ((TextView)findViewById(R.id.single_image_tview_tags)).setText("Teste");
 
         findViewById(R.id.singleview_iview).setOnClickListener(this);

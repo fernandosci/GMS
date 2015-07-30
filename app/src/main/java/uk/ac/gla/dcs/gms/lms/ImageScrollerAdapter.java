@@ -13,18 +13,20 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ImageScroller extends ArrayAdapter<Pair> implements View.OnClickListener {
+import uk.ac.gla.dcs.gms.main.MainActivity;
 
-    public static final String IMG_ID = "img_id";
+public class ImageScrollerAdapter extends ArrayAdapter<Pair> implements View.OnClickListener {
+
+    public static final String ARG_IMG_URL = "ARG_IMG_URL";
 
     private ArrayList<Pair> items;
     private int count, stepNumber;
 
-    public ImageScroller(Context context, int resource, ArrayList<Pair> objects, int startingItems, int stepNumber) {
+    public ImageScrollerAdapter(Context context, int resource, ArrayList<Pair> objects, int initialCacheSize, int cacheIncrement) {
         super(context, resource, objects);
         items = objects;
-        count = startingItems;
-        this.stepNumber = stepNumber;
+        count = initialCacheSize;
+        this.stepNumber = cacheIncrement;
     }
 
 
@@ -82,7 +84,7 @@ public class ImageScroller extends ArrayAdapter<Pair> implements View.OnClickLis
     public void onClick(View v) {
         if (v.getId() == R.id.row_layout_iview || v.getId() == R.id.row_layout_iview2) {
             Bundle bundle = new Bundle();
-            bundle.putInt(IMG_ID, (Integer) v.getTag());
+            bundle.putInt(ARG_IMG_URL, (Integer) v.getTag());
 
             Intent intent = new Intent(MainActivity.instance, SingleViewActivity.class);
             intent.putExtras(bundle);

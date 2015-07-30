@@ -43,7 +43,7 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.register);
+        setContentView(R.layout.mainf_register);
 
         editTxtEmail = (EditText) findViewById(R.id.register_edittxt_email);
         editTxtFirstName = (EditText) findViewById(R.id.register_edittxt_first_name);

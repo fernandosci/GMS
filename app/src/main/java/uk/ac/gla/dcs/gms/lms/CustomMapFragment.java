@@ -21,7 +21,7 @@ public class CustomMapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.maps, container, false);
+        View v = inflater.inflate(R.layout.mainf_maps, container, false);
 
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) v.findViewById(R.id.mapview);

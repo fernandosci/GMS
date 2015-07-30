@@ -43,7 +43,7 @@
             android:label="@string/title_single_view" >
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="uk.ac.gla.dcs.gms.main.MainActivity"
             android:label="@string/title_activity_main" >
         </activity>
         <meta-data
