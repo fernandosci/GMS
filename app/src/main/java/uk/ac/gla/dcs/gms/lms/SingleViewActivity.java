@@ -6,8 +6,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 @SuppressWarnings("deprecation")
 public class SingleViewActivity extends ActionBarActivity implements View.OnClickListener {
+
+    private ImageView imageView;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,11 +21,22 @@ public class SingleViewActivity extends ActionBarActivity implements View.OnClic
 
         Bundle bundle = getIntent().getExtras();
 
-        ((ImageView)findViewById(R.id.singleview_iview)).setImageResource(bundle.getInt(ImageScroller.IMG_ID));
-        ((TextView)findViewById(R.id.single_image_tview_tags)).setText("Teste");
+        imageView = (ImageView) findViewById(R.id.singleview_iview);
+        textView = (TextView) findViewById(R.id.single_image_tview_tags);
 
-        findViewById(R.id.singleview_iview).setOnClickListener(this);
-        findViewById(R.id.single_image_tview_tags).setOnClickListener(this);
+        String url;
+        Integer resource = bundle.getInt(ImageScroller.IMG_ID);
+        if (resource == 0) {
+            url = bundle.getString(ImageScroller.IMG_ID);
+            Picasso.with(getApplicationContext()).load(url).into(imageView);
+        }
+        else {
+            Picasso.with(getApplicationContext()).load(resource).into(imageView);
+        }
+        textView.setText("Test");
+
+        imageView.setOnClickListener(this);
+        textView.setOnClickListener(this);
     }
 
     @Override

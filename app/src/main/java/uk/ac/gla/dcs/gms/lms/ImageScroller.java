@@ -2,7 +2,9 @@ package uk.ac.gla.dcs.gms.lms;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
 
@@ -41,18 +46,23 @@ public class ImageScroller extends ArrayAdapter<Pair> implements View.OnClickLis
         if (t != null) {
             ImageView imageView = (ImageView) view.findViewById(R.id.row_layout_iview);
             ImageView imageView2 = (ImageView) view.findViewById(R.id.row_layout_iview2);
-           // ((TextView)view.findViewById(R.id.textView)).setText(Integer.toString(position));
-             ((TextView)view.findViewById(R.id.textView)).setText("");
-            if (imageView != null) {
-                imageView.setImageResource((Integer) t.first);
-                imageView.setTag(t.first);
-                imageView.setOnClickListener(this);
+
+            imageView.setOnClickListener(this);
+            imageView.setTag(t.first);
+            imageView2.setOnClickListener(this);
+            imageView2.setTag(t.second);
+
+            if (t.first instanceof String) {
+                Picasso.with(getContext()).load((String) t.first).resize(50, 50).into(imageView);
+                Picasso.with(getContext()).load((String) t.second).resize(50, 50).into(imageView2);
             }
-            if (imageView2 != null) {
-                imageView2.setImageResource((Integer) t.second);
-                imageView2.setTag(t.second);
-                imageView2.setOnClickListener(this);
+
+            else {
+                Picasso.with(getContext()).load((Integer) t.first).into(imageView);
+                Picasso.with(getContext()).load((Integer) t.second).into(imageView2);
             }
+
+            ((TextView) view.findViewById(R.id.textView)).setText(Integer.toString(position));
         }
 
         return view;
@@ -82,12 +92,15 @@ public class ImageScroller extends ArrayAdapter<Pair> implements View.OnClickLis
     public void onClick(View v) {
         if (v.getId() == R.id.row_layout_iview || v.getId() == R.id.row_layout_iview2) {
             Bundle bundle = new Bundle();
-            bundle.putInt(IMG_ID, (Integer) v.getTag());
-
+            if (v.getTag() instanceof String) {
+                bundle.putString(IMG_ID, (String) v.getTag());
+            }
+            else {
+                bundle.putInt(IMG_ID, (Integer) v.getTag());
+            }
             Intent intent = new Intent(MainActivity.instance, SingleViewActivity.class);
             intent.putExtras(bundle);
             MainActivity.instance.startActivity(intent);
-            //Utils.shortToast(MainActivity.instance.getApplicationContext(), "Aqui?" + Integer.toString((Integer) v.getTag()));
         }
     }
 }

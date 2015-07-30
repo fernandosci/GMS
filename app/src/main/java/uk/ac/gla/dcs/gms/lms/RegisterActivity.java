@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -56,11 +57,14 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
 
 
         btnRegister.setOnClickListener(this);
-        tViewSecretQuestion.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        tViewSecretQuestion.setOnClickListener(this);
+        editTxtLastName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                Log.v("Bruno", Integer.toString(actionId));
+                Log.v("Bruno", Integer.toString(EditorInfo.IME_ACTION_NEXT));
                 if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                    tViewSecretQuestion.performLongClick();
+                    tViewSecretQuestion.performClick();
                     return true;
                 }
                 return false;
@@ -111,7 +115,6 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     tViewSecretQuestion.setText(questions[which]);
-                    tViewSecretQuestion.setTag(0, true);
                     editTxtAnswer.requestFocus();
                 }
             });
