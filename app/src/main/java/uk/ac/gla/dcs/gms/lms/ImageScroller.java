@@ -56,7 +56,6 @@ public class ImageScroller extends ArrayAdapter<Pair> implements View.OnClickLis
                 Picasso.with(getContext()).load((String) t.first).resize(50, 50).into(imageView);
                 Picasso.with(getContext()).load((String) t.second).resize(50, 50).into(imageView2);
             }
-
             else {
                 Picasso.with(getContext()).load((Integer) t.first).into(imageView);
                 Picasso.with(getContext()).load((Integer) t.second).into(imageView2);
