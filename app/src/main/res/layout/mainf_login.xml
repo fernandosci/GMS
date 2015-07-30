@@ -8,7 +8,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:id="@+id/login_screen">
 
     <ImageView
         android:id="@+id/login_iview_logo"
@@ -76,5 +77,16 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:text="Register" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_pbar"
+        android:layout_alignTop="@+id/login_btn"
+        android:layout_alignLeft="@+id/login_btn"
+        android:layout_alignBottom="@+id/login_btn"
+        android:layout_marginLeft="15dp"
+        android:visibility="invisible"/>
 
 </RelativeLayout>
