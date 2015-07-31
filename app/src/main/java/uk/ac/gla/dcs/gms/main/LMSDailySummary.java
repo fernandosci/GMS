@@ -127,7 +127,7 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
 
             if (successful) {
 
-                ArrayList<String> img_urls = (ArrayList<String>) data.get("img_urls");
+                ArrayList<String> img_urls = ( ArrayList<String>) data.get("img_urls");
                 String p1 = null, p2 = null;
 
                 boolean parity = true;
