@@ -59,7 +59,6 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
         localListener = new LocalListener();
         imgList = new ArrayList<>();
         hasCallback = false;
-        session = null;
         skip = 0;
         context = inflater.getContext();
 
@@ -86,7 +85,7 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
         builder.setLimit(10).setPersonal(true);
         session.getImages(localListener, 0, builder.toString());
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return rootView;
     }
 
     @Override
@@ -142,9 +141,11 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
 
                 progressBar.setVisibility((20 < imgList.size()) ? View.VISIBLE : View.GONE);
                 adapter.notifyDataSetChanged();
+
             } else {
                 ErrorsUtils.processHttpResponseError(context, data, exception);
             }
+            hasCallback = false;
         }
 
         @Override
@@ -158,7 +159,6 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
             LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder();
             builder.setLimit(10).setPersonal(true).setSkip(skip);
             session.getImages(localListener, 1, builder.toString());
-            hasCallback = false;
         }
     }
 }

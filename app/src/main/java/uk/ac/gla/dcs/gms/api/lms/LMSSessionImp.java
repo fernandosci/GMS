@@ -405,6 +405,8 @@ public class LMSSessionImp implements LMSSession {
                         throw new Exception("Error processing images urls from json content.");
                     }
                 }
+                if (urls.size() > 0)
+                    data.put("img_urls",urls);
             }
         }
 

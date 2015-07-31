@@ -1,6 +1,7 @@
 package uk.ac.gla.dcs.gms.lms;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,8 +48,13 @@ public class ImageScrollerAdapter extends ArrayAdapter<Pair<String,String>> {
             imageView2.setOnClickListener(clickListener);
             imageView2.setTag(t.second);
 
-            Picasso.with(getContext()).load( t.first).resize(50, 50).into(imageView);
-            Picasso.with(getContext()).load( t.second).resize(50, 50).into(imageView2);
+            DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
+            if (!t.first.isEmpty())
+                Picasso.with(getContext()).load( t.first).resize(metrics.widthPixels/2, 500).into(imageView);
+            if (!t.second.isEmpty()) {
+                Picasso.with(getContext()).load( t.second).resize(metrics.widthPixels/2, 500).into(imageView2);
+            }
+
 
 
             ((TextView) view.findViewById(R.id.textView)).setText(Integer.toString(position));

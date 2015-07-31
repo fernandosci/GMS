@@ -24,16 +24,10 @@ public class SingleViewActivity extends ActionBarActivity implements View.OnClic
         imageView = (ImageView) findViewById(R.id.singleview_iview);
         textView = (TextView) findViewById(R.id.single_image_tview_tags);
 
-        String url;
-        Integer resource = bundle.getInt(ImageScrollerAdapter.ARG_IMG_URL);
-        if (resource == 0) {
-            url = bundle.getString(ImageScrollerAdapter.ARG_IMG_URL);
-            Picasso.with(getApplicationContext()).load(url).into(imageView);
-        }
-        else {
-            Picasso.with(getApplicationContext()).load(resource).into(imageView);
-        }
-        textView.setText("Test");
+        String url = bundle.getString(ImageScrollerAdapter.ARG_IMG_URL);
+        Picasso.with(getApplicationContext()).load(url).into(imageView);
+
+        textView.setText("");       //fixme
 
         imageView.setOnClickListener(this);
         textView.setOnClickListener(this);

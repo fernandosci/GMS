@@ -84,17 +84,17 @@ public class MainActivity extends ActionBarActivity
 //                        .replace(R.id.container, PlaceholderFragment.newInstance(position))
 //                        .commit();
 //                break;
-//            case 2:
-//                bundle = new Bundle();
-//                bundle.putDouble(CustomMapFragment.LAT, 43.1);
-//                bundle.putDouble(CustomMapFragment.LNG, -87.9);
-//                customMapFragment = new CustomMapFragment();
-//                customMapFragment.setArguments(bundle);
-//                fragmentManager.beginTransaction()
-//                        .replace(R.id.container, customMapFragment)
-//                        .commit();
-//                restoreActionBar();
-//                break;
+            case 2:
+                bundle = new Bundle();
+                bundle.putDouble(CustomMapFragment.LAT, 43.1);
+                bundle.putDouble(CustomMapFragment.LNG, -87.9);
+                customMapFragment = new CustomMapFragment();
+                customMapFragment.setArguments(bundle);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, customMapFragment)
+                        .commit();
+                restoreActionBar();
+                break;
 //            case 3:
 //                bundle = new Bundle();
 //                bundle.putDouble(CustomMapFragment.LAT, 51.470087);
