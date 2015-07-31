@@ -57,7 +57,7 @@ public class ImageScrollerAdapter extends ArrayAdapter<Pair<String,String>> {
 
 
 
-            ((TextView) view.findViewById(R.id.textView)).setText(Integer.toString(position));
+            ((TextView) view.findViewById(R.id.textView)).setText("");
         }
 
         return view;

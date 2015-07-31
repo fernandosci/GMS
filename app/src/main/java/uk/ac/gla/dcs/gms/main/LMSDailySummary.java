@@ -1,24 +1,19 @@
 package uk.ac.gla.dcs.gms.main;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
@@ -33,7 +28,7 @@ import uk.ac.gla.dcs.gms.utils.ErrorsUtils;
 /**
  * Created by ito.
  */
-public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnScrollListener, View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnScrollListener {
 
     private ListView listView;
     private ProgressBar progressBar;
@@ -92,9 +87,6 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
         builder.setLimit(10).setPersonal(true);
         session.getImages(localListener, 0, builder.toString());
 
-        button = (Button) rootView.findViewById(R.id.lms_daily_summary_button);
-        button.setOnClickListener(this);
-
         return rootView;
     }
 
@@ -117,39 +109,6 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
             mHandler.postDelayed(localListener, 300);
             hasCallback = true;
         }
-
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == button.getId()) {
-            Integer day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-            Integer month = Calendar.getInstance().get(Calendar.MONTH);
-            Integer year = Calendar.getInstance().get(Calendar.YEAR);
-
-            new DatePickerDialog(context, this, year, month, day).show();
-
-        }
-    }
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder();
-
-        begin = Calendar.getInstance();
-        end = Calendar.getInstance();
-        begin.set(year, monthOfYear, dayOfMonth, 0, 1);
-        end.set(year, monthOfYear, dayOfMonth, 23, 59);
-
-        imgList.clear();
-
-        builder.setInterval(begin, end)
-                .setLimit(10)
-                .setPersonal(true)
-                .setSkip(imgList.size());
-
-        session.getImages(localListener, 0, builder.toString());
-
 
     }
 
