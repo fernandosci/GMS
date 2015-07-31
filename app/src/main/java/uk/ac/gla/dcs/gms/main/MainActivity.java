@@ -57,6 +57,7 @@ public class MainActivity extends ActionBarActivity
 
         //might remove these lines
         fragmentManager = getSupportFragmentManager();
+        onNavigationDrawerItemSelected(0);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class MainActivity extends ActionBarActivity
         switch (position) {
             case 0:
                 if (lmsSession != null) {
-                    Fragment fragment = (Fragment) LMSDailySummary.newInstance("0", lmsSession);
+                    Fragment fragment = LMSDailySummary.newInstance("0", lmsSession);
                     fragmentManager.beginTransaction()
                             .replace(R.id.container, fragment)
                                     .commit();
