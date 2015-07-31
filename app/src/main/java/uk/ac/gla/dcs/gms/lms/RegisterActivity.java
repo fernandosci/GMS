@@ -61,8 +61,6 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
         editTxtLastName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                Log.v("Bruno", Integer.toString(actionId));
-                Log.v("Bruno", Integer.toString(EditorInfo.IME_ACTION_NEXT));
                 if (actionId == EditorInfo.IME_ACTION_NEXT) {
                     tViewSecretQuestion.performClick();
                     return true;
