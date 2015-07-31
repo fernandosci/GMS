@@ -8,14 +8,14 @@
         android:layout_height="438dp"
         android:id="@+id/listView"
         android:layout_gravity="center_horizontal"
-        android:layout_above="@+id/button2"
+        android:layout_above="@+id/lms_daily_summary_button"
         android:layout_alignParentTop="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Date Picker"
-        android:id="@+id/button2"
+        android:id="@+id/lms_daily_summary_button"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
