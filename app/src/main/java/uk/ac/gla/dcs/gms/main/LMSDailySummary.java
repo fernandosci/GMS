@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
@@ -34,12 +35,12 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
     private ProgressBar progressBar;
     private ImageScrollerAdapter adapter;
     private Handler mHandler;
-    private ArrayList<Pair<String, String>> imgList;
+    private HashSet<String> imgList;
+    private ArrayList<Pair<String, String>> imgViewList;
     private LocalListener localListener;
     private boolean hasCallback;
     private LMSSession session;
     private Context context;
-    private int skip;
 
     public LMSDailySummary() {
     }
@@ -57,9 +58,8 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         localListener = new LocalListener();
-        imgList = new ArrayList<>();
-        hasCallback = false;
-        skip = 0;
+        imgList = new HashSet();
+        imgViewList = new ArrayList<>();
         context = inflater.getContext();
 
         View rootView;
@@ -77,10 +77,11 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
         listView = (ListView) rootView.findViewById(R.id.listView);
         listView.addFooterView(footer);
 
-        adapter = new ImageScrollerAdapter(inflater.getContext(), R.layout.row_layout, imgList, localListener);
+        adapter = new ImageScrollerAdapter(inflater.getContext(), R.layout.row_layout, imgViewList, localListener);
         listView.setAdapter(adapter);
         listView.setOnScrollListener(this); //listen for a scroll movement to the bottom
 
+        hasCallback = true;
         LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder();
         builder.setLimit(10).setPersonal(true);
         session.getImages(localListener, 0, builder.toString());
@@ -127,19 +128,35 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
             if (successful) {
 
                 ArrayList<String> img_urls = (ArrayList<String>) data.get("img_urls");
-                Pair<String, String> pair;
+                String p1 = null, p2 = null;
 
-                for (int c = 0; c < img_urls.size(); c+=2) {
+                boolean parity = true;
+                for (int c = 0; c < img_urls.size(); c++) {
 
-                    if (c < img_urls.size() - 1)
-                        pair = new Pair<>(img_urls.get(c), img_urls.get(c + 1));
-                    else
-                        pair = new Pair<>(img_urls.get(c), "");
+                    String s = img_urls.get(c);
+                    if (!imgList.contains(s)) {
+                        imgList.add(s);
 
-                    imgList.add(pair);
+                        if (parity) {
+                            p1 = s;
+                            p2 = null;
+                            parity = !parity;
+                        } else {
+                            p2 = s;
+                            parity = !parity;
+                        }
+                    }
+
+                    if ((p1 != null && p2 != null) || (p1 != null && c == img_urls.size()-1)) {
+                        if (p2 == null)
+                            p2 = "";
+                        imgViewList.add(new Pair<String, String>(p1,p2));
+                        p1 = null;
+                        p2 = null;
+                    }
                 }
 
-                progressBar.setVisibility((20 < imgList.size()) ? View.VISIBLE : View.GONE);
+                progressBar.setVisibility((20 < imgViewList.size()) ? View.VISIBLE : View.GONE);
                 adapter.notifyDataSetChanged();
 
             } else {
@@ -155,9 +172,8 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
 
         @Override
         public void run() {
-            skip++;
             LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder();
-            builder.setLimit(10).setPersonal(true).setSkip(skip);
+            builder.setLimit(10).setPersonal(true).setSkip(imgList.size());
             session.getImages(localListener, 1, builder.toString());
         }
     }
