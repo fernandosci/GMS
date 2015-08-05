@@ -2,7 +2,7 @@ package uk.ac.gla.dcs.gms.api.lms;
 
 import java.util.Calendar;
 
-import uk.ac.gla.dcs.gms.api.UrlParameterBuilder;
+import uk.ac.gla.dcs.gms.api.http.UrlParameterBuilder;
 
 
 public class LMSImageRequestParamBuilder extends UrlParameterBuilder{

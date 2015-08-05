@@ -1,15 +1,16 @@
-package uk.ac.gla.dcs.gms.api;
+package uk.ac.gla.dcs.gms.api.http;
 
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class UrlParameterBuilder {
-    protected HashMap<String,String> params;
+    protected Map<String,String> params;
 
 
     public UrlParameterBuilder() {
-        params = new HashMap<>();
+        params = new LinkedHashMap<>();
     }
 
     public UrlParameterBuilder setCustomParameter(String field, String value){

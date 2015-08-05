@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -23,6 +22,7 @@ import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 import uk.ac.gla.dcs.gms.api.validation.RegisterValidation;
+import uk.ac.gla.dcs.gms.utils.ErrorsUtils;
 
 @SuppressWarnings("deprecation")
 public class RegisterActivity extends ActionBarActivity implements View.OnClickListener {
@@ -216,21 +216,9 @@ public class RegisterActivity extends ActionBarActivity implements View.OnClickL
                 finish();
             }
             else{
-
-                if (data.containsKey(getString(R.string.lms_api_StandardFieldErrorsKey)))
-                {
-                    String[] errors = (String[]) data.get(getString(R.string.lms_api_StandardFieldErrorsKey));
-
-                    Utils.shortToast(getApplicationContext(),errors[0]);
-                }else if (exception!= null) {
-                    exception.printStackTrace();
-
-                    Utils.shortToast(getApplicationContext(), exception.getMessage());
-                }
-
+                ErrorsUtils.processHttpResponseError(RegisterActivity.this.getBaseContext(),data,exception);
                 btnRegister.setEnabled(true);
             }
-
         }
 
         @Override

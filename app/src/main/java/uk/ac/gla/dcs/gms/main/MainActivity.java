@@ -9,10 +9,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import uk.ac.gla.dcs.gms.api.GMS;
-import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.lms.LMSSession;
-import uk.ac.gla.dcs.gms.lms.CustomMapFragment;
+import uk.ac.gla.dcs.gms.lms.LMSDailySummary;
+import uk.ac.gla.dcs.gms.lms.LMSMapFragment;
 import uk.ac.gla.dcs.gms.lms.R;
 
 @SuppressWarnings("deprecation")
@@ -46,15 +45,6 @@ public class MainActivity extends ActionBarActivity
                 R.id.main_fragment_navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-
-        try {
-            lmsSession = GMS.getInstance().getLMSSession();
-        } catch (GMSException e) {
-            //todo improve error handling
-            e.printStackTrace();
-            lmsSession = null;
-        }
-
         //might remove these lines
         fragmentManager = getSupportFragmentManager();
         onNavigationDrawerItemSelected(0);
@@ -64,7 +54,7 @@ public class MainActivity extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
-        CustomMapFragment customMapFragment;
+        LMSMapFragment lmsMapFragment;
         Bundle bundle;
 
         String[] titles = getResources().getStringArray(R.array.main_titles);
@@ -73,12 +63,10 @@ public class MainActivity extends ActionBarActivity
 
         switch (position) {
             case 0:
-                if (lmsSession != null) {
-                    Fragment fragment = LMSDailySummary.newInstance("0", lmsSession);
+                    Fragment fragment = LMSDailySummary.newInstance("0");
                     fragmentManager.beginTransaction()
                             .replace(R.id.container, fragment)
                                     .commit();
-                }
                 break;
 //            case 1:
 //                fragmentManager.beginTransaction()
@@ -86,20 +74,23 @@ public class MainActivity extends ActionBarActivity
 //                        .commit();
 //                break;
             case 2:
-                bundle = new Bundle();
-                bundle.putDouble(CustomMapFragment.LAT, 43.1);
-                bundle.putDouble(CustomMapFragment.LNG, -87.9);
-                customMapFragment = new CustomMapFragment();
-                customMapFragment.setArguments(bundle);
+                lmsMapFragment = LMSMapFragment.newInstance("2",LMSMapFragment.MODE_HEATMAP);
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, customMapFragment)
+                        .replace(R.id.container, lmsMapFragment)
+                        .commit();
+                restoreActionBar();
+                break;
+            case 3:
+                lmsMapFragment = LMSMapFragment.newInstance("3",LMSMapFragment.MODE_TRAILS);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, lmsMapFragment)
                         .commit();
                 restoreActionBar();
                 break;
 //            case 3:
 //                bundle = new Bundle();
-//                bundle.putDouble(CustomMapFragment.LAT, 51.470087);
-//                bundle.putDouble(CustomMapFragment.LNG, -0.452046);
+//                bundle.putDouble(CustomMapFragment.ARG_LAT, 51.470087);
+//                bundle.putDouble(CustomMapFragment.ARG_LON, -0.452046);
 //                customMapFragment = new CustomMapFragment();
 //                customMapFragment.setArguments(bundle);
 //                fragmentManager.beginTransaction()
@@ -109,8 +100,8 @@ public class MainActivity extends ActionBarActivity
 //                break;
 //            case 4:
 //                bundle = new Bundle();
-//                bundle.putDouble(CustomMapFragment.LAT, 55.873399);
-//                bundle.putDouble(CustomMapFragment.LNG, -4.289192);
+//                bundle.putDouble(CustomMapFragment.ARG_LAT, 55.873399);
+//                bundle.putDouble(CustomMapFragment.ARG_LON, -4.289192);
 //                customMapFragment = new CustomMapFragment();
 //                customMapFragment.setArguments(bundle);
 //                fragmentManager.beginTransaction()

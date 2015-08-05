@@ -7,35 +7,27 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 
-public class APIHttpJSONResponse {
+public class APIHttpResponse {
     private static final String TAG = "APIHttpResponse";
 
     private HttpURLConnection urlConnection;
-    private JSONObject jsonResponse;
+    private String responseData;
     private Exception exception;
     private boolean failed;
 
 
-    public APIHttpJSONResponse(HttpURLConnection urlConnection, String jsonStr) {
+    public APIHttpResponse(HttpURLConnection urlConnection, String data) {
         this.urlConnection = urlConnection;
         this.failed = false;
         this.exception = null;
-
-        try {
-            this.jsonResponse = new JSONObject(jsonStr);
-        } catch (JSONException e) {
-            Log.e(TAG, e.toString());
-            e.printStackTrace();
-            failed = true;
-            exception = e;
-        }
+        this.responseData = data;
     }
 
-    public APIHttpJSONResponse(HttpURLConnection urlConnection, boolean failed, Exception exception) {
+    public APIHttpResponse(HttpURLConnection urlConnection, boolean failed, Exception exception) {
         this.urlConnection = urlConnection;
         this.failed = failed;
         this.exception = exception;
-        this.jsonResponse = null;
+        this.responseData = null;
     }
 
 
@@ -43,8 +35,16 @@ public class APIHttpJSONResponse {
         return urlConnection;
     }
 
-    public JSONObject getJsonResponse() {
-        return jsonResponse;
+    public JSONObject getResponseAsJSON() {
+        JSONObject jsonObject;
+
+        try {
+            jsonObject = new JSONObject(responseData);
+        } catch (JSONException e) {
+            Log.e(TAG, e.toString());
+            jsonObject = null;
+        }
+        return jsonObject;
     }
 
     public Exception getException() {
@@ -53,5 +53,9 @@ public class APIHttpJSONResponse {
 
     public boolean isFailed() {
         return failed;
+    }
+
+    public String getResponseData() {
+        return responseData;
     }
 }

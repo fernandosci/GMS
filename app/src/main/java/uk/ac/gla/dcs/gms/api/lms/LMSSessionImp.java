@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,11 +21,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.GMSExceptionBuilder;
 import uk.ac.gla.dcs.gms.api.OnCredentialsRequiredListener;
-import uk.ac.gla.dcs.gms.api.http.APIHttpJSONResponse;
+import uk.ac.gla.dcs.gms.api.http.APIHttpResponse;
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 import uk.ac.gla.dcs.gms.lms.R;
@@ -43,15 +46,13 @@ public class LMSSessionImp implements LMSSession {
 
 
     private Context context;
-    private LMSService lmsService;
     private String token;
     private boolean expired;
     private int timeout;
 
     private OnCredentialsRequiredListener credentialsRequiredListener;
 
-    public LMSSessionImp(Context context, LMSService lmsService) {
-        this.lmsService = lmsService;
+    public LMSSessionImp(Context context) {
         this.context = context.getApplicationContext();
         this.credentialsRequiredListener = null;
         token = "";
@@ -59,19 +60,19 @@ public class LMSSessionImp implements LMSSession {
         timeout = 5000;
     }
 
-    public LMSSessionImp(Context context, LMSService lmsService, String token) {
-        this.context = context;
-        this.lmsService = lmsService;
+    public LMSSessionImp(Context context, OnCredentialsRequiredListener onCredentialsRequiredListener, String token) {
+        this.context = context.getApplicationContext();
+        this.credentialsRequiredListener = onCredentialsRequiredListener;
         this.token = token;
         this.expired = false;
         timeout = 5000;
     }
 
-    private static Object getField(APIHttpJSONResponse response, String fieldName) throws GMSException {
+    private static Object getField(JSONObject response, String fieldName) throws GMSException {
         try {
-            if (response.getJsonResponse() != null) {
-                if (response.getJsonResponse().has(fieldName)) {
-                    return response.getJsonResponse().get(fieldName);
+            if (response != null) {
+                if (response.has(fieldName)) {
+                    return response.get(fieldName);
                 } else
                     return null;
             } else {
@@ -140,6 +141,12 @@ public class LMSSessionImp implements LMSSession {
         this.expired = expired;
     }
 
+    protected void renewSession(String newToken){
+        this.token = newToken;
+        this.expired = false;
+        //TODO maybe do some verification, but not sure if needed
+    }
+
     private HttpURLConnection getUrlConnection(HTTPResponseListener listener, int requestCode, String complement, String parameters) {
         try {
             return (HttpURLConnection) new URL(getResources().getString(R.string.lms_httpUrl) + complement + parameters).openConnection();
@@ -169,7 +176,7 @@ public class LMSSessionImp implements LMSSession {
         String basicAuth = "Basic " + new String(Base64.encode(authString.getBytes(), Base64.NO_WRAP | Base64.URL_SAFE));
         urlConnection.setRequestProperty("Authorization", basicAuth);
 
-        LMSHttpJsonRequest request = new LMSHttpJsonRequest(listener, requestCode, processCode);
+        LMSHttpRequest request = new LMSHttpRequest(listener, requestCode, processCode);
         request.execute(urlConnection);
     }
 
@@ -191,28 +198,34 @@ public class LMSSessionImp implements LMSSession {
 
         urlConnection.setRequestProperty("Cookie", "token=" + token);
 
-        LMSHttpJsonRequest request = new LMSHttpJsonRequest(listener, requestCode, processCode);
+        LMSHttpRequest request = new LMSHttpRequest(listener, requestCode, processCode);
         request.execute(urlConnection);
     }
 
-    private class LMSHttpJsonRequest extends AsyncTask<HttpURLConnection, HTTPProgressStatus, APIHttpJSONResponse> {
+    private class LMSHttpRequest extends AsyncTask<HttpURLConnection, HTTPProgressStatus, APIHttpResponse> {
         private static final String TAG = "LMSHttpRequest";
         private final HTTPResponseListener httpResponseListener;
-        private int requestCode;
-        private int processCode;
+        private final int requestCode;
+        private final int processCode;
 
-        public LMSHttpJsonRequest(HTTPResponseListener httpResponseListener, int requestCode, int processCode) {
+        private final HashMap<String, Object> dataResult;
+        private final ArrayList<String> errorMessages;
+        private Integer status;
+        private GMSExceptionBuilder exceptionBuilder;
+
+
+
+        public LMSHttpRequest(HTTPResponseListener httpResponseListener, int requestCode, int processCode) {
             this.requestCode = requestCode;
             this.processCode = processCode;
             this.httpResponseListener = httpResponseListener;
+            this.errorMessages = new ArrayList<>();
+            this.dataResult = new HashMap<>();
         }
 
         @Override
-        protected APIHttpJSONResponse doInBackground(HttpURLConnection... params) {
-
-            APIHttpJSONResponse response = null;
-            HTTPProgressStatus ps = new HTTPProgressStatus(params.length);
-
+        protected APIHttpResponse doInBackground(HttpURLConnection... params) {
+            APIHttpResponse httpResponse = null;
 
             HttpURLConnection urlConnection = params[0];
 
@@ -220,148 +233,160 @@ public class LMSSessionImp implements LMSSession {
 
             try {
                 in = urlConnection.getInputStream();
-                response = new APIHttpJSONResponse(urlConnection, IOUtils.toString(in, "UTF-8"));
-                ps.incProcessed();
+                httpResponse = new APIHttpResponse(urlConnection, IOUtils.toString(in, "UTF-8"));
             } catch (IOException e) {
-                ps.incFailed();
                 e.printStackTrace();
-                response = new APIHttpJSONResponse(urlConnection, true, e);
+                httpResponse = new APIHttpResponse(urlConnection, true, e);
             }
-            publishProgress(new HTTPProgressStatus(ps));
-            return response;
+
+            //set status, errorMessages, data and exceptions if any
+            processHttpResponse(httpResponse);
+
+            return httpResponse;
         }
 
         @Override
-        protected void onPostExecute(APIHttpJSONResponse response) {
-            GMSExceptionBuilder exceptionBuilder = null;
-            Integer status = null;
-            String[] errorMessages = null;
-            Object dataObj = null;
+        protected void onPostExecute(APIHttpResponse response) {
+            Exception e;
+            if (exceptionBuilder == null) {
+                e = null;
+            }else{
+                e = exceptionBuilder.addExtra("response", response).build();
+            }
+
+            //return the results, successful if no error messages and no exceptions
+            httpResponseListener.onResponse(requestCode, errorMessages.isEmpty() && e == null, dataResult, e);
+        }
+
+        private void processHttpResponse(APIHttpResponse response){
+            exceptionBuilder = null;
+            status = null;
 
             if (response.isFailed()) {
                 //check if had an exception, encapsulate to give a response
-                exceptionBuilder = new GMSExceptionBuilder(null, -1, getResources().getString(R.string.lms_messages_errors_genericNetworkFail));//FIXME error code
-            } else if (response.getJsonResponse() == null) {
-                //json requests always
-                exceptionBuilder = new GMSExceptionBuilder(null, -1, "Json response is invalid or not found.");//FIXME error code
+                exceptionBuilder = new GMSExceptionBuilder(null, -1, getResources().getString(R.string.lms_messages_errors_genericNetworkFail));
+                status = -1;
             } else {
-                //process json data, check for status, errors and data
-                try {
-                    //get status
-                    Object statusObj = getField(response, getResources().getString(R.string.lms_api_StandardFieldStatusKey));
-                    if (statusObj instanceof Integer) {
-                        status = (Integer) statusObj;
+                //check if its a json object
+                JSONObject responseAsJSON = response.getResponseAsJSON();
+                if (responseAsJSON != null) {
+                    //set fields status and error messages, fill exception builder if necessary and get json data field
+                    Object dataObj = processJsonData(responseAsJSON);
+                    if (dataObj != null){
+                        fillDataResult(dataObj);
+                    }
+                }
+                else{
+                    //non json response data.. not sure what to do to validate...
+                    //set status field
+                    try {
+                        status = response.getUrlConnection().getResponseCode();
+                    } catch (IOException e) {
+                        status = -1;   //FIXME put a status code that makes sense...
+                    }
+                    // there is no error message from response, get only the data content...
+                    if (!response.getResponseData().isEmpty())
+                        fillDataResult(response.getResponseData());
+                }
+            }
 
-                        //check for errors
-                        Object errorsObj = getField(response, getResources().getString(R.string.lms_api_StandardFieldErrorsKey));
-                        if (errorsObj instanceof JSONArray) {
-                            JSONArray jArray = (JSONArray) errorsObj;
+            dataResult.put(getResources().getString(R.string.lms_api_StandardFieldStatusKey), status);
+            if ( errorMessages.size() > 0)
+                dataResult.put(getResources().getString(R.string.lms_api_StandardFieldErrorsKey), errorMessages);
 
-                            errorMessages = new String[jArray.length()];
-                            for (int c = 0; c < errorMessages.length; c++) {
-                                try {
-                                    errorMessages[c] = jArray.getString(c);
-                                } catch (JSONException e) {
-                                    //also should never reach here
-                                    errorMessages[c] = "";
-                                    Log.e(TAG, "Error processing error field");
-                                    e.printStackTrace();
-                                }
+        }
+
+
+
+        private Object processJsonData(JSONObject responseAsJSON){
+            Object dataObj = null;
+            //process json data, check for status, errors and data
+            try {
+                //get status
+                Object statusObj = getField(responseAsJSON, getResources().getString(R.string.lms_api_StandardFieldStatusKey));
+                if (statusObj instanceof Integer) {
+                    status = (Integer) statusObj;
+
+                    //check for errors
+                    Object errorsObj = getField(responseAsJSON, getResources().getString(R.string.lms_api_StandardFieldErrorsKey));
+                    if (errorsObj instanceof JSONArray) {
+                        JSONArray jArray = (JSONArray) errorsObj;
+
+                        for (int c = 0; c < jArray.length(); c++) {
+                            try {
+                                errorMessages.add(jArray.getString(c));
+                            } catch (JSONException e) {
+                                //also should never reach here
+                                Log.e(TAG, "Error processing error field index " + c + "/" + jArray.length());
+                                e.printStackTrace();
                             }
                         }
-
-                        //get data
-                        dataObj = getField(response, getResources().getString(R.string.lms_api_StandardFieldDataKey));
-
-                        //if reach here, no errors found yet
-                    } else {
-                        //should never reach here
-                        exceptionBuilder = new GMSExceptionBuilder(null, -1, "Error processing status code.");//FIXME error code
                     }
-                } catch (GMSException e) {
+
+                    //get data
+                    dataObj = getField(responseAsJSON, getResources().getString(R.string.lms_api_StandardFieldDataKey));
+
+                    //if reach here, no errors found yet
+                } else {
                     //should never reach here
-                    Log.e(TAG, "Error processing response");
-                    e.printStackTrace();
-                    exceptionBuilder = new GMSExceptionBuilder(e, -1, "Error getting field from json content."); //FIXME error code
+                    exceptionBuilder = new GMSExceptionBuilder(null, -1, "Error processing status code.");//FIXME error code
                 }
+            } catch (GMSException e) {
+                //should never reach here
+                Log.e(TAG, "Error processing json response");
+                e.printStackTrace();
+                exceptionBuilder = new GMSExceptionBuilder(e, -1, "Error getting field from json content."); //FIXME error code
             }
-//
-            if (exceptionBuilder == null) {
-                //process data
-                HashMap<String, Object> data = null;
-                try {
-                    data = processResponse(processCode, status, errorMessages, dataObj, response);
 
-                } catch (Exception e) {
-                    Log.e(TAG, "Error processing data from json content.");
-                    e.printStackTrace();
-                    exceptionBuilder = new GMSExceptionBuilder(e, -1, "Error processing data from json content.");
-                }
-
-                if (exceptionBuilder == null) {
-                    //success!
-                    httpResponseListener.onResponse(requestCode, errorMessages == null, data, null);
-                    return;
-                }
-            }
-            //here there was an exception, forward it...
-            httpResponseListener.onResponse(requestCode, false, new HashMap<String, Object>(0), exceptionBuilder.addExtra("response", response).build());
+            return dataObj;
         }
+
 
         @Override
         protected void onProgressUpdate(HTTPProgressStatus... values) {
-            //TODO
-
-
+            //TODO might not be necessary..
         }
 
-        private HashMap<String, Object> processResponse(int processCode, Integer status, String[] errorMessages, Object dataObj, APIHttpJSONResponse response) throws Exception {
-
-            HashMap<String, Object> data = new HashMap<>();
-
-            data.put(getResources().getString(R.string.lms_api_StandardFieldStatusKey), status);
-
-            if (errorMessages != null && errorMessages.length > 0)
-
-                data.put(getResources().getString(R.string.lms_api_StandardFieldErrorsKey), errorMessages);
-
-            else {
-
+        private void fillDataResult(Object dataObj) {
+            try {
                 switch (processCode) {
                     case PROCESSCODE_LOGIN:
                     case PROCESSCODE_REGISTER: {
-                        processAuthentication(data, dataObj);
+                        processAuthentication(dataObj);
                     }
                     break;
                     case PROCESSCODE_IMAGES: {
-                        processGetImages(data, dataObj);
+                        processGetImages(dataObj);
                     }
                     break;
                     case PROCESSCODE_STATS: {
-                        processGetStats(data, dataObj);
+                        processGetStats(dataObj);
                     }
                     break;
                     case PROCESSCODE_TRAILS: {
-                        processGetTrails(data, dataObj);
+                        processGetTrails(dataObj);
                     }
                     break;
                     case PROCESSCODE_USERDETAIL: {
-                        processUserInfo(data, dataObj);
+                        processUserInfo( dataObj);
                     }
                     break;
                     case PROCESSCODE_VIDEOS: {
-                        processGetVideos(data, dataObj);
+                        processGetVideos(dataObj);
                     }
                     break;
                     default: {
 
                     }
                 }
+            } catch (Exception e) {
+                Log.e(TAG, "Error processing data");
+                e.printStackTrace();
+                exceptionBuilder = new GMSExceptionBuilder(e, -1, "Error processing data content");
             }
-            return data;
         }
 
-        private void processUserInfo(HashMap<String, Object> data, Object dataObj) throws Exception {
+        private void processUserInfo( Object dataObj) throws Exception {
             try {
                 if (dataObj instanceof JSONObject) {
                     JSONObject objUser = (JSONObject) dataObj;
@@ -370,7 +395,7 @@ public class LMSSessionImp implements LMSSession {
 
                     while (keys.hasNext()) {
                         String key = keys.next();
-                        data.put(key, objUser.getString(key));
+                        dataResult.put(key, objUser.getString(key));
                     }
                 }
 
@@ -382,23 +407,34 @@ public class LMSSessionImp implements LMSSession {
             throw new Exception("Could not parse user information content.");
         }
 
-        private void processAuthentication(HashMap<String, Object> data, Object dataObj) throws Exception {
+        private void processAuthentication( Object dataObj) throws Exception {
             if (dataObj instanceof String && ((String) dataObj).length() > 0) {
-                data.put("token", dataObj);
+                dataResult.put("token", dataObj);
             } else {
                 throw new Exception("Invalid token received");
             }
         }
 
-        private void processGetImages(HashMap<String, Object> data, Object dataObj) throws Exception {
+        private void processGetImages( Object dataObj) throws Exception {
 
             if (dataObj instanceof JSONArray) {
                 JSONArray jarray = (JSONArray) dataObj;
                 ArrayList<String> urls = new ArrayList<>();
+                
                 for (int c = 0; c < jarray.length(); c++) {
                     try {
                         JSONObject o = (JSONObject) jarray.get(c);
+
                         urls.add(((String) o.get("url")).replace("..", getResources().getString(R.string.lms_httpUrl)));
+
+                        Iterator<String> it = o.keys();
+                        while (it.hasNext()) {
+                            String n = it.next();
+//                            // TODO: add other values here
+//                            pairs.put(n, o.getString(n));
+                        }
+
+
                     } catch (JSONException e) {
                         Log.e(TAG, "Error processing images urls from json content.");
                         e.printStackTrace();
@@ -406,21 +442,33 @@ public class LMSSessionImp implements LMSSession {
                     }
                 }
 
-                data.put("img_urls", urls);
+                dataResult.put("img_urls", urls);
             }
         }
 
-        private void processGetStats(HashMap<String, Object> data, Object dataObj) throws Exception {
+        private void processGetStats( Object dataObj) throws Exception {
             //TODO
 
         }
 
-        private void processGetTrails(HashMap<String, Object> data, Object dataObj) throws Exception {
-            //TODO
+        private void processGetTrails( Object dataObj) throws Exception {
+            //not the best validator...
+            if (dataObj instanceof String && ((String) dataObj).startsWith("<?xml")){
+                dataResult.put("xml_trails", dataObj);
+            }else{
+                JSONArray jCoords = (JSONArray)dataObj;
+                List<LatLng> heatmap = new ArrayList<>();
 
+                for (int c = 0 ;c < jCoords.length(); c++){
+                    JSONArray coord = (JSONArray) jCoords.get(c);
+                    heatmap.add(new LatLng(coord.getDouble(0),coord.getDouble(1)));
+                }
+
+                dataResult.put("heatmap", heatmap);
+            }
         }
 
-        private void processGetVideos(HashMap<String, Object> data, Object dataObj) throws Exception {
+        private void processGetVideos(Object dataObj) throws Exception {
             //TODO
 
         }

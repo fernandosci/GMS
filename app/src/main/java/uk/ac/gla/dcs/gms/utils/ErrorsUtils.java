@@ -2,6 +2,7 @@ package uk.ac.gla.dcs.gms.utils;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import uk.ac.gla.dcs.gms.Utils;
@@ -16,12 +17,15 @@ public class ErrorsUtils {
 
         if (data.containsKey(context.getString(R.string.lms_api_StandardFieldErrorsKey)))
         {
-            String[] errors = (String[]) data.get(context.getString(R.string.lms_api_StandardFieldErrorsKey));
+            ArrayList<String> errors = (ArrayList<String>) data.get(context.getString(R.string.lms_api_StandardFieldErrorsKey));
+            if (errors.size() > 0) {
+                Utils.shortToast(context, errors.get(0));
+                return;
+            }
+        }
 
-            Utils.shortToast(context, errors[0]);
-        }else if (exception!= null) {
+        if (exception!= null) {
             exception.printStackTrace();
-
             Utils.shortToast(context, exception.getMessage());
         }
     }

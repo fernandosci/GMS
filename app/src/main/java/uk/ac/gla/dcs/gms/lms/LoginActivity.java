@@ -7,10 +7,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.HashMap;
@@ -22,6 +20,7 @@ import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 import uk.ac.gla.dcs.gms.main.MainActivity;
+import uk.ac.gla.dcs.gms.utils.ErrorsUtils;
 
 @SuppressWarnings("deprecation")
 public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
@@ -30,17 +29,13 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
     private final static int CODE_REGISTER = 0;
     private static final int STARTUP = 1000;
+    ProgressBar progressBar;
     private LocalLoginResponseListener httpResponseListener;
-
-
     private EditText editTxtEmail;
     private EditText editTxtPassword;
     private ImageView imgViewLogo;
-
     private Button btnRegister;
     private Button btnLogin;
-    ProgressBar progressBar;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +54,6 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     }
 
     private void init() {
-
         editTxtEmail = (EditText) findViewById(R.id.login_edittxt_email);
         editTxtPassword = (EditText) findViewById(R.id.login_edittxt_password);
         imgViewLogo = (ImageView) findViewById(R.id.login_iview_logo);
@@ -128,20 +122,9 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             if (successful)
                 login();
             else {
-                {
-                    if (requestCode != STARTUP) {
-                        if (data.containsKey(getString(R.string.lms_api_StandardFieldErrorsKey)))
-                        {
-                            String[] errors = (String[]) data.get(getString(R.string.lms_api_StandardFieldErrorsKey));
-
-                            Utils.shortToast(getApplicationContext(),errors[0]);
-                        }else if (exception!= null) {
-                            exception.printStackTrace();
-
-                            Utils.shortToast(getApplicationContext(), exception.getMessage());
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    }
+                if (requestCode != STARTUP) {
+                    ErrorsUtils.processHttpResponseError(LoginActivity.this.getBaseContext(), data, exception);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         }

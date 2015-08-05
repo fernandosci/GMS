@@ -13,6 +13,7 @@ public abstract class GMSMainFragment extends Fragment{
 
     @Override
     public void onAttach(Activity activity) {
+        //// fixme not currently in use...
         //this fragment have been attached to activity, if supported, notify it
         if (activity instanceof GMSMainFragmentCallbacks){
             if (getArguments().containsKey(ARG_SECTION)){

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="gmsrest_httpUrl">http://gmsrest.dcs.gla.ac.uk</string>
-    <string name="lms_httpUrl">http://testlifelog.ddns.net:50322</string>
+    <string name="lms_httpUrl">http://testlifelog.ddns.net</string>
 
 
     <string name="lms_endpointRegister">/api/auth/local/register</string>

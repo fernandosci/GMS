@@ -1,4 +1,4 @@
-package uk.ac.gla.dcs.gms.main;
+package uk.ac.gla.dcs.gms.lms;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -22,13 +22,13 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import uk.ac.gla.dcs.gms.api.GMS;
+import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 import uk.ac.gla.dcs.gms.api.lms.LMSImageRequestParamBuilder;
 import uk.ac.gla.dcs.gms.api.lms.LMSSession;
-import uk.ac.gla.dcs.gms.lms.ImageScrollerAdapter;
-import uk.ac.gla.dcs.gms.lms.R;
-import uk.ac.gla.dcs.gms.lms.SingleViewActivity;
+import uk.ac.gla.dcs.gms.main.GMSMainFragment;
 import uk.ac.gla.dcs.gms.utils.ErrorsUtils;
 
 /**
@@ -44,20 +44,16 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
     private ArrayList<Pair<String, String>> imgViewList;
     private LocalListener localListener;
     private boolean hasCallback;
-    private LMSSession session;
     private Context context;
     private Button button;
     private Calendar begin, end;
+    private LMSSession lmsSession;
 
-    public LMSDailySummary() {
-    }
-
-    public static LMSDailySummary newInstance(String section, LMSSession session) {
+    public static LMSDailySummary newInstance(String section) {
         LMSDailySummary dailySummary = new LMSDailySummary();
         Bundle args = new Bundle();
         args.putString(ARG_SECTION, section);
         dailySummary.setArguments(args);
-        dailySummary.session = session;
         return dailySummary;
     }
 
@@ -89,9 +85,20 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
         listView.setOnScrollListener(this); //listen for a scroll movement to the bottom
 
         hasCallback = true;
+
+        try {
+            lmsSession = GMS.getInstance().getLMSSession();
+        } catch (GMSException e) {
+            e.printStackTrace();
+            lmsSession = null;
+            //todo handle error...
+        }
+
         LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder();
         builder.setLimit(10).setPersonal(true);
-        session.getImages(localListener, 0, builder.toString());
+
+
+        lmsSession.getImages(localListener, 0, builder.toString());
 
         button = (Button) rootView.findViewById(R.id.lms_daily_summary_button);
         button.setOnClickListener(this);
@@ -131,7 +138,7 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
                 .setInterval(begin, end)
                 .setPersonal(true);
 
-        session.getImages(localListener, 0, builder.toString());
+        lmsSession.getImages(localListener, 0, builder.toString());
 
     }
 
@@ -220,7 +227,7 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
         public void run() {
             LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder();
             builder.setLimit(10).setPersonal(true).setSkip(imgList.size());
-            session.getImages(localListener, 1, builder.toString());
+            lmsSession.getImages(localListener, 1, builder.toString());
         }
     }
 }

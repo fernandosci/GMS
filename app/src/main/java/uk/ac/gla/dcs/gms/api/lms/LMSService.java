@@ -21,17 +21,20 @@ import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 
 
 public class LMSService implements ServiceProvider, AuthenticationProvider, RegistrationProvider {
+    private static final String TAG = "LMSService";
 
     public static final String SERVICENAME = "LMS Service";
     public static final int OPERATION_REGISTER = 0;
     public static final int OPERATION_LOCAL = 1;
     public static final int OPERATION_FACEBOOK = 2;
-    private static final String TAG = "LMSService";
+
     private static final String USERFILENAME = "lmsUser";
     private static final String[] supportedAuthProviders = {"local"};
     private static final String[] requiredRegisterFields = {"username", "password", "email", "answer", "question"};
 
     private Context context;
+    private LMSSessionImp lmsSession;
+    private LocalCredentialsRenewHandler credentialsRenewHandler;
     private OnCredentialsRequiredListener credListener;
 
     private LMSUser gmsUser;
@@ -39,6 +42,8 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
 
     public LMSService(Context context) {
         this.context = context.getApplicationContext();
+        this.lmsSession = null;
+        this.credentialsRenewHandler = null;
         this.credListener = null;
 
         try {
@@ -83,7 +88,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
 
     private void getToken(HTTPResponseListener httpResponseListener, int operation, Map<String, String> data) {
 
-        LMSSessionImp tmpSession = new LMSSessionImp(context, this);
+        LMSSessionImp tmpSession = new LMSSessionImp(context);
 
         HTTPResponseListener proxyListener = new LocalProxyResponseListener(httpResponseListener);
         switch (operation) {
@@ -171,7 +176,13 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
 
     public LMSSession getLMSSession() throws GMSException {
         if (gmsUser.getToken() != null) {
-            return new LMSSessionImp(context, this, gmsUser.getToken());
+            if (lmsSession == null) {
+                //lazy session initialization
+                credentialsRenewHandler = new LocalCredentialsRenewHandler();
+                lmsSession = new LMSSessionImp(context,credentialsRenewHandler,gmsUser.getToken());
+            }
+            //todo verify if any other check is needed about the session validation
+            return lmsSession;
         } else
             throw new GMSException("Not logged in", null, -1);
     }
@@ -228,4 +239,13 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         public void onProgress(int requestCode, HTTPProgressStatus progressStatus, HashMap<String, Object> newdata) {
         }
     }
+
+    private class LocalCredentialsRenewHandler implements OnCredentialsRequiredListener{
+
+        @Override
+        public void onCredentialsRequired(ServiceProvider service, Set<String> supportedProviders) {
+            //TODO IMPLEMENT SESSION RENEW
+        }
+    }
+
 }
