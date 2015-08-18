@@ -21,15 +21,35 @@
     <!-- endpoint uploads-->
 
 
-
-
-    <string name="lms_messages_errors_genericNetworkFail">Network failed. Please try again latter.</string>
-
     <string name="lms_api_StandardFieldErrorsKey">errors</string>
     <string name="lms_api_StandardFieldDataKey">data</string>
     <string name="lms_api_StandardFieldStatusKey">status</string>
 
+
+    <string name="LMS_URLPARAM_FROM">from</string>
+    <string name="LMS_URLPARAM_TO">to</string>
+    <string name="LMS_URLPARAM_UPLOAD">upload</string>
+    <string name="LMS_URLPARAM_LIMIT">limit</string>
+    <string name="LMS_URLPARAM_SKIP">skip</string>
+    <string name="LMS_URLPARAM_PERSONAL">personal</string>
+    <string name="LMS_URLPARAM_RADIUS">radius</string>
+    <string name="LMS_URLPARAM_LAT">lat</string>
+    <string name="LMS_URLPARAM_LOG">log</string>
+    <string name="LMS_URLPARAM_ALLIMAGES">allImages</string>
+    <string name="LMS_URLPARAM_KEYMOMENTS">keyMoments</string>
+
+
+    <string name="LMS_DATAKEY_TOKEN">token</string>
+    <string name="LMS_DATAKEY_UrlImgList">img_urls</string>
+    <string name="LMS_DATAKEY_HEATMAP">heatmap</string>
+    <string name="LMS_DATAKEY_XMLTRAILS">xml_trails</string>
+
+
+
+
+
     <string name="debug_username">debug12345</string>
     <string name="debug_password">abcdABCD1234!#$</string>
+    <string name="LMS_URLPARAM_HEATMAP">heatmap</string>
 
 </resources>

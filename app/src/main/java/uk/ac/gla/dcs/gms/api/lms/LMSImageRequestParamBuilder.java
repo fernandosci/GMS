@@ -1,24 +1,27 @@
 package uk.ac.gla.dcs.gms.api.lms;
 
+import android.content.res.Resources;
+
 import java.util.Calendar;
 
 import uk.ac.gla.dcs.gms.api.http.UrlParameterBuilder;
+import uk.ac.gla.dcs.gms.lms.R;
 
 
 public class LMSImageRequestParamBuilder extends UrlParameterBuilder{
 
     public LMSImageRequestParamBuilder setInterval(Calendar from, Calendar to){
 
-        setCalendarValues("from",from);
+        setCalendarValues( Resources.getSystem().getString(R.string.LMS_URLPARAM_FROM),from);
 
-        setCalendarValues("to",to);
+        setCalendarValues(Resources.getSystem().getString(R.string.LMS_URLPARAM_TO),to);
 
         return this;
     }
 
     public LMSImageRequestParamBuilder setUpload(){
 
-        params.put("upload",String.valueOf(true));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_UPLOAD),String.valueOf(true));
 
         return this;
     }
@@ -26,33 +29,33 @@ public class LMSImageRequestParamBuilder extends UrlParameterBuilder{
 
     public LMSImageRequestParamBuilder setLimit(int limit){
 
-        params.put("limit",String.valueOf(limit));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_LIMIT),String.valueOf(limit));
 
         return this;
     }
 
     public LMSImageRequestParamBuilder setSkip(int skip){
 
-        params.put("skip",String.valueOf(skip));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_SKIP),String.valueOf(skip));
 
         return this;
     }
     public LMSImageRequestParamBuilder setPersonal(boolean personal){
-        params.put("personal",String.valueOf(personal));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_PERSONAL),String.valueOf(personal));
         return this;
     }
     public LMSImageRequestParamBuilder setPosition(int radius,float lat, float log){
-        params.put("radius",String.valueOf(radius));
-        params.put("lat",String.valueOf(lat));
-        params.put("log",String.valueOf(log));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_RADIUS),String.valueOf(radius));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_LAT),String.valueOf(lat));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_LOG),String.valueOf(log));
         return this;
     }
     public LMSImageRequestParamBuilder setAllImages(){
-        params.put("allImages",String.valueOf(true));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_ALLIMAGES),String.valueOf(true));
         return this;
     }
     public LMSImageRequestParamBuilder setKeyMoments(){
-        params.put("keyMoments",String.valueOf(true));
+        params.put(Resources.getSystem().getString(R.string.LMS_URLPARAM_KEYMOMENTS),String.valueOf(true));
         return this;
     }
 

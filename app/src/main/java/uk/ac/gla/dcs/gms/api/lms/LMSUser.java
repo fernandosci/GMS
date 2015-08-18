@@ -4,6 +4,14 @@ import uk.ac.gla.dcs.gms.api.GMSUser;
 
 public class LMSUser extends GMSUser{
 
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_USERNAME = "username";
+    public static final String FIELD_EMAIL = "email";
+    public static final String FIELD_UPLOADASPRIVATE = "uploadAsPrivate";
+    public static final String FIELD_TOKEN = "token";
+    public static final String FIELD_TOKENUPDATE = "tokenUpdate";
+    public static final String FIELD_QUESTION = "question";
+
     public LMSUser() {
         super(LMSService.SERVICENAME);
     }
@@ -11,51 +19,51 @@ public class LMSUser extends GMSUser{
 
     public void fillUser(String id, String username, String email, boolean uploadAsPrivate, String token, String tokenUpdate, String question) {
 
-        user.put("id",id);
-        user.put("username",username);
-        user.put("email",email);
-        user.put("uploadAsPrivate", String.valueOf(uploadAsPrivate));
-        user.put("token",token);
-        user.put("tokenUpdate",tokenUpdate);
-        user.put("question",question);
+        user.put(FIELD_ID,id);
+        user.put(FIELD_USERNAME,username);
+        user.put(FIELD_EMAIL,email);
+        user.put(FIELD_UPLOADASPRIVATE, String.valueOf(uploadAsPrivate));
+        user.put(FIELD_TOKEN,token);
+        user.put(FIELD_TOKENUPDATE,tokenUpdate);
+        user.put(FIELD_QUESTION,question);
     }
 
     public String getId() {
-        if (user.get("id") == null)
+        if (user.get(FIELD_ID) == null)
             return "";
         else
-        return user.get("id");
+        return user.get(FIELD_ID);
     }
 
     public void setId(String id) {
-        user.put("id",id);
+        user.put(FIELD_ID,id);
     }
 
     public String getUsername() {
-        if (user.get("username") == null)
+        if (user.get(FIELD_USERNAME) == null)
             return "";
         else
-            return user.get("username");
+            return user.get(FIELD_USERNAME);
     }
 
     public void setUsername(String username) {
-        user.put("username",username);
+        user.put(FIELD_USERNAME,username);
     }
 
     public String getEmail() {
-        if (user.get("email") == null)
+        if (user.get(FIELD_EMAIL) == null)
             return "";
         else
-            return user.get("email");
+            return user.get(FIELD_EMAIL);
     }
 
     public void setEmail(String email) {
-        user.put("email",email);
+        user.put(FIELD_EMAIL,email);
     }
 
     public Boolean isUploadAsPrivate(){
 
-        String uploadAsPrivate = user.get("uploadAsPrivate");
+        String uploadAsPrivate = user.get(FIELD_UPLOADASPRIVATE);
         if (uploadAsPrivate != null) {
             return Boolean.parseBoolean(uploadAsPrivate);
         }
@@ -64,40 +72,40 @@ public class LMSUser extends GMSUser{
     }
 
     public void setUploadAsPrivate(boolean uploadAsPrivate) {
-        user.put("uploadAsPrivate", String.valueOf(uploadAsPrivate));
+        user.put(FIELD_UPLOADASPRIVATE, String.valueOf(uploadAsPrivate));
     }
 
     public String getToken() {
-        if (user.get("token") == null)
+        if (user.get(FIELD_TOKEN) == null)
             return "";
         else
-            return user.get("token");
+            return user.get(FIELD_TOKEN);
     }
 
     public void setToken(String token) {
-        user.put("token",token);
+        user.put(FIELD_TOKEN,token);
     }
 
     public String getTokenUpdate() {
-        if (user.get("tokenUpdate") == null)
+        if (user.get(FIELD_TOKENUPDATE) == null)
             return "";
         else
-            return user.get("tokenUpdate");
+            return user.get(FIELD_TOKENUPDATE);
     }
 
     public void setTokenUpdate(String tokenUpdate) {
-        user.put("tokenUpdate",tokenUpdate);
+        user.put(FIELD_TOKENUPDATE,tokenUpdate);
     }
 
     public String getQuestion() {
-        if (user.get("question") == null)
+        if (user.get(FIELD_QUESTION) == null)
             return "";
         else
-            return user.get("question");
+            return user.get(FIELD_QUESTION);
     }
 
     public void setQuestion(String question) {
-        user.put("question",question);
+        user.put(FIELD_QUESTION,question);
     }
 
     //    DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");

@@ -16,8 +16,8 @@ public class CredentialAdapter {
     public static final CredentialAdapter getLocalCredentialAdapter(String username, String password){
         CredentialAdapter credentialAdapter = new CredentialAdapter(PROVIDER_LOCAL);
 
-        credentialAdapter.info.put("username",username);
-        credentialAdapter.info.put("password",password);
+        credentialAdapter.info.put(GMSUser.FIELD_USERNAME,username);
+        credentialAdapter.info.put(GMSUser.FIELD_PASSWORD,password);
 
         return credentialAdapter;
     }

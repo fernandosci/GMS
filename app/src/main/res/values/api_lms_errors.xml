@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="lms_messages_errors_genericNetworkFail">Network failed. Please try again latter.</string>
+
+
+</resources>

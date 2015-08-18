@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string name="FIELD_USERNAME">username</string>
+    <string name="FIELD_PASSWORD">password</string>
+    <string name="FIELD_QUESTION">question</string>
+    <string name="FIELD_ANSWER">answer</string>
+    <string name="FIELD_EMAIL">email</string>
+</resources>
