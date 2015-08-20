@@ -31,8 +31,8 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     public static final int OPERATION_FACEBOOK = 2;
 
     private static final String USERFILENAME = "lmsUser";
-    private static final String[] supportedAuthProviders = {CredentialAdapter.PROVIDER_LOCAL};
-    private static final String[] requiredRegisterFields = {GMSUser.FIELD_USERNAME, GMSUser.FIELD_PASSWORD, GMSUser.FIELD_EMAIL,  GMSUser.FIELD_ANSWER,  GMSUser.FIELD_QUESTION};
+    private final String[] supportedAuthProviders;
+    private final String[] requiredRegisterFields;
 
     private Context context;
     private LMSSessionImp lmsSession;
@@ -53,6 +53,15 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         } catch (Exception e) {
             lmsUser = new LMSUser();
         }
+
+        supportedAuthProviders = new String[]{CredentialAdapter.PROVIDER_LOCAL};
+        requiredRegisterFields = new String[]{
+                context.getString(R.string.FIELD_USERNAME),
+                context.getString(R.string.FIELD_PASSWORD),
+                context.getString(R.string.FIELD_EMAIL),
+                context.getString(R.string.FIELD_ANSWER),
+                context.getString(R.string.FIELD_QUESTION)
+        };
     }
 
     @Override
@@ -79,7 +88,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     public void loginWithCredentials(HTTPResponseListener httpResponseListener, int requestCode, CredentialAdapter credAdapter) throws GMSException {
 
         if (credAdapter.getProvider().equals(CredentialAdapter.PROVIDER_LOCAL)) {
-            if (credAdapter.getFields().contains(GMSUser.FIELD_PASSWORD) && credAdapter.getFields().contains(GMSUser.FIELD_PASSWORD))
+            if (credAdapter.getFields().contains(context.getString(R.string.FIELD_PASSWORD)) && credAdapter.getFields().contains(context.getString(R.string.FIELD_PASSWORD)))
                 getToken(httpResponseListener, OPERATION_LOCAL, credAdapter.getMap());
             else
                 throw new GMSException("Missing fields.", null, -1);
@@ -96,17 +105,17 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
         switch (operation) {
             case OPERATION_REGISTER: {
                 tmpSession.register(proxyListener, OPERATION_REGISTER,
-                        data.get(GMSUser.FIELD_USERNAME),
-                        data.get(GMSUser.FIELD_PASSWORD),
-                        data.get(GMSUser.FIELD_EMAIL),
-                        data.get(GMSUser.FIELD_ANSWER),
-                        data.get(GMSUser.FIELD_QUESTION));
+                        data.get(context.getString(R.string.FIELD_USERNAME)),
+                        data.get(context.getString(R.string.FIELD_PASSWORD)),
+                        data.get(context.getString(R.string.FIELD_EMAIL)),
+                        data.get(context.getString(R.string.FIELD_ANSWER)),
+                        data.get(context.getString(R.string.FIELD_QUESTION)));
             }
             break;
             case OPERATION_LOCAL: {
                 tmpSession.login(proxyListener, OPERATION_LOCAL,
-                        data.get(GMSUser.FIELD_USERNAME),
-                        data.get(GMSUser.FIELD_PASSWORD));
+                        data.get(context.getString(R.string.FIELD_USERNAME)),
+                        data.get(context.getString(R.string.FIELD_PASSWORD)));
             }
             break;
             default:
@@ -227,7 +236,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
 
 
                 if (successful) {
-                    lmsUser.setToken((String) data.get(context.getResources().getString(R.string.LMS_DATAKEY_TOKEN)));
+                    lmsUser.setToken((String) data.get(context.getString(R.string.LMS_DATAKEY_TOKEN)));
                     try {
                         lmsUser.saveToFile(context, USERFILENAME);
                     } catch (Exception e) {

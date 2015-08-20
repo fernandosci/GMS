@@ -19,25 +19,17 @@ public class GMS implements ServiceProvider, AuthenticationProvider, Registratio
     private static final String SERVICENAME = "GMS local Service";
     private static final String FILE_USERINFO = "gms_userinfo";
     private static GMS instance = null;
-    private final Context context;
+    private static Context context;
     private final Map<String, ServiceProvider> services;
     private int authProvCount;
     private int regProvCount;
     private OnCredentialsRequiredListener credListener;
-    private GMS(Context context) {
-        this.context = context.getApplicationContext();
 
-        services = new HashMap<>();
-        credListener = null;
-        authProvCount = 0;
-        regProvCount = 0;
-
-        this.init();
-    }
 
     public static void initialize(Context context){
         if (instance == null) {
-            instance = new GMS(context.getApplicationContext());
+            GMS.context = context.getApplicationContext();
+            instance = new GMS();
         }
     }
 
@@ -47,6 +39,18 @@ public class GMS implements ServiceProvider, AuthenticationProvider, Registratio
             throw new ExceptionInInitializerError();
         }
         return instance;
+    }
+
+    private GMS() {
+        services = new HashMap<>();
+        credListener = null;
+        authProvCount = 0;
+        regProvCount = 0;
+        this.init();
+    }
+
+    public static Context getApplicationContext(){
+        return context;
     }
 
     private void init() {

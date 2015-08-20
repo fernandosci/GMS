@@ -409,7 +409,7 @@ public class LMSSessionImp implements LMSSession {
 
         private void processAuthentication( Object dataObj) throws Exception {
             if (dataObj instanceof String && ((String) dataObj).length() > 0) {
-                dataResult.put(context.getResources().getString(R.string.LMS_DATAKEY_TOKEN), dataObj);
+                dataResult.put(context.getString(R.string.LMS_DATAKEY_TOKEN), dataObj);
             } else {
                 throw new Exception("Invalid token received");
             }
@@ -442,7 +442,7 @@ public class LMSSessionImp implements LMSSession {
                     }
                 }
 
-                dataResult.put(context.getResources().getString(R.string.LMS_DATAKEY_UrlImgList), urls);
+                dataResult.put(context.getString(R.string.LMS_DATAKEY_UrlImgList), urls);
             }
         }
 
@@ -454,7 +454,7 @@ public class LMSSessionImp implements LMSSession {
         private void processGetTrails( Object dataObj) throws Exception {
             //not the best way to check type but...
             if (dataObj instanceof String && ((String) dataObj).startsWith("<?xml")){
-                dataResult.put(context.getResources().getString(R.string.LMS_DATAKEY_XMLTRAILS), dataObj);
+                dataResult.put(context.getString(R.string.LMS_DATAKEY_XMLTRAILS), dataObj);
             }else{
                 JSONArray jCoords = (JSONArray)dataObj;
                 List<LatLng> heatmap = new ArrayList<>();
@@ -464,7 +464,7 @@ public class LMSSessionImp implements LMSSession {
                     heatmap.add(new LatLng(coord.getDouble(0),coord.getDouble(1)));
                 }
 
-                dataResult.put(context.getResources().getString(R.string.LMS_DATAKEY_HEATMAP), heatmap);
+                dataResult.put(context.getString(R.string.LMS_DATAKEY_HEATMAP), heatmap);
             }
         }
 

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import uk.ac.gla.dcs.gms.lms.R;
+
 
 public class CredentialAdapter {
 
@@ -16,8 +18,8 @@ public class CredentialAdapter {
     public static final CredentialAdapter getLocalCredentialAdapter(String username, String password){
         CredentialAdapter credentialAdapter = new CredentialAdapter(PROVIDER_LOCAL);
 
-        credentialAdapter.info.put(GMSUser.FIELD_USERNAME,username);
-        credentialAdapter.info.put(GMSUser.FIELD_PASSWORD,password);
+        credentialAdapter.info.put(GMS.getApplicationContext().getString(R.string.FIELD_USERNAME),username);
+        credentialAdapter.info.put(GMS.getApplicationContext().getString(R.string.FIELD_PASSWORD),password);
 
         return credentialAdapter;
     }

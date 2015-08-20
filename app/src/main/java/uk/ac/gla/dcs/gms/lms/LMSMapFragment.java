@@ -134,7 +134,7 @@ public class LMSMapFragment extends GMSMainFragment {
             Calendar from = Calendar.getInstance();
             from.setTimeInMillis(0);
             Calendar to = Calendar.getInstance();
-            lmsSession.getTrails(localHttpListener,MODE_TRAILS, new LMSTrailsRequestParamBuilder().setIsPersonal(true).setIsHeatmap(false).setInterval(from,to).toString());
+            lmsSession.getTrails(localHttpListener,MODE_TRAILS, new LMSTrailsRequestParamBuilder(context).setIsPersonal(true).setIsHeatmap(false).setInterval(from,to).toString());
         }
     }
 
@@ -144,7 +144,7 @@ public class LMSMapFragment extends GMSMainFragment {
             Calendar from = Calendar.getInstance();
             from.setTimeInMillis(0);
             Calendar to = Calendar.getInstance();
-            lmsSession.getTrails(localHttpListener,MODE_HEATMAP, new LMSTrailsRequestParamBuilder().setIsPersonal(true).setIsHeatmap(true).setInterval(from,to).toString());
+            lmsSession.getTrails(localHttpListener,MODE_HEATMAP, new LMSTrailsRequestParamBuilder(context).setIsPersonal(true).setIsHeatmap(true).setInterval(from,to).toString());
         }
     }
 
