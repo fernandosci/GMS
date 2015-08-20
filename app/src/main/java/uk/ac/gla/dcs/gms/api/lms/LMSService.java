@@ -193,7 +193,7 @@ public class LMSService implements ServiceProvider, AuthenticationProvider, Regi
     }
 
     public LMSSession getLMSSession() throws GMSException {
-        if (lmsUser.getToken().isEmpty()) {
+        if (!lmsUser.getToken().isEmpty()) {
             if (lmsSession == null) {
                 //lazy session initialization
                 credentialsRenewHandler = new LocalCredentialsRenewHandler();
