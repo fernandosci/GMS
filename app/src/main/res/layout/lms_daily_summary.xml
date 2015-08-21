@@ -3,13 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="438dp"
-        android:id="@+id/listView"
-        android:layout_gravity="center_horizontal"
-        android:layout_above="@+id/lms_daily_summary_button"
-        android:layout_alignParentTop="true" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/lms_daily_summary_button">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/listView"
+            android:layout_gravity="center_horizontal"
+            android:layout_above="@+id/lms_daily_summary_button"
+            android:layout_alignParentTop="true" />
+
+        <ImageView
+            android:id="@+id/lms_daily_summary_expanded_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/bonus_coin"
+            android:visibility="invisible"/>
+
+    </FrameLayout>
 
     <Button
         android:layout_width="wrap_content"
@@ -19,11 +33,5 @@
         android:layout_gravity="center_horizontal"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
-
-    <ImageView
-        android:id="@+id/lms_daily_summary_expanded_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible" />
 
 </RelativeLayout>
