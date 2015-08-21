@@ -9,7 +9,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import uk.ac.gla.dcs.gms.api.lms.LMSSession;
 import uk.ac.gla.dcs.gms.lms.LMSDailySummary;
 import uk.ac.gla.dcs.gms.lms.LMSMapFragment;
 import uk.ac.gla.dcs.gms.lms.R;
@@ -28,8 +27,7 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
-    public static FragmentManager fragmentManager;
-    private LMSSession lmsSession;
+    public FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +42,9 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.main_fragment_navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        //set up the backpress eventbus
+
 
         //might remove these lines
         fragmentManager = getSupportFragmentManager();

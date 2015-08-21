@@ -10,7 +10,7 @@
 
     <string-array name="main_titles">
         <item>Daily Summary</item>
-        <item>Images</item>
+        <item>All Images</item>
         <item>Heat Map</item>
         <item>Trails Map</item>
         <item>Hot Spots</item>
