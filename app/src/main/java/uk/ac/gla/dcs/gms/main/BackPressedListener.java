@@ -10,12 +10,12 @@ import android.os.Bundle;
  */
 public abstract class BackPressedListener extends BroadcastReceiver {
 
-    public static final String BROADCAST_EVENT = "asldfjasldfj";
-    public static final String BROADCAST_REPLY= "asldfjaSSSsldfj";
+    public static final String BACKPRESSEDACTION = "asldfjasldfj";
+    public static final String BACKPRESSEDRESPONSE = "asldfjaSSSsldfj";
     public static final String KEY_ID = "ID";
     public static final String KEY_CONSUMED = "C";
 
-    
+
 
     @Override
     public final void onReceive(Context context, Intent intent) {
@@ -25,10 +25,11 @@ public abstract class BackPressedListener extends BroadcastReceiver {
 
         boolean result = onBackPressed();
 
-        Intent i = new Intent(BROADCAST_REPLY);
+        Intent i = new Intent(BACKPRESSEDRESPONSE);
         i.putExtra(KEY_ID,anInt);
-        i.putExtra(KEY_CONSUMED,result);
+        i.putExtra(KEY_CONSUMED, result);
 
+        context.unregisterReceiver(this);
         context.sendBroadcast(i);
     }
 

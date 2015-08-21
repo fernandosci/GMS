@@ -1,5 +1,9 @@
 package uk.ac.gla.dcs.gms.main;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,6 +12,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.util.Random;
 
 import uk.ac.gla.dcs.gms.lms.LMSDailySummary;
 import uk.ac.gla.dcs.gms.lms.LMSMapFragment;
@@ -29,6 +35,10 @@ public class MainActivity extends ActionBarActivity
 
     public FragmentManager fragmentManager;
 
+    private LocalBroadcastReceiver bReceiver;
+
+    private int backpressedId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +53,12 @@ public class MainActivity extends ActionBarActivity
                 R.id.main_fragment_navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        //set up the backpress eventbus
+        //set up broadcast
+        bReceiver = new LocalBroadcastReceiver();
+        IntentFilter iFilter = new IntentFilter();
+        iFilter.addAction(BackPressedListener.BACKPRESSEDRESPONSE);
+        backpressedId=  0;
+        getApplicationContext().registerReceiver(bReceiver,iFilter);
 
 
         //might remove these lines
@@ -154,5 +169,38 @@ public class MainActivity extends ActionBarActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(BackPressedListener.BACKPRESSEDACTION);
+        backpressedId = new Random().nextInt();
+        i.putExtra(BackPressedListener.KEY_ID,backpressedId);
+        sendBroadcast(i);
+
+    }
+
+
+    private class LocalBroadcastReceiver extends BroadcastReceiver{
+
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().equals(BackPressedListener.BACKPRESSEDRESPONSE)){
+                Bundle extras = intent.getExtras();
+
+                int id = extras.getInt(BackPressedListener.KEY_ID);
+                if (id == backpressedId){
+
+                    boolean backConsumed = extras.getBoolean(BackPressedListener.KEY_CONSUMED);
+
+                    if (!backConsumed){
+                        MainActivity.super.onBackPressed();
+                    }
+                }
+            }
+
+        }
     }
 }
