@@ -7,9 +7,11 @@ import android.animation.ObjectAnimator;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -43,6 +45,7 @@ import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
 import uk.ac.gla.dcs.gms.api.http.HTTPResponseListener;
 import uk.ac.gla.dcs.gms.api.lms.LMSImageRequestParamBuilder;
 import uk.ac.gla.dcs.gms.api.lms.LMSSession;
+import uk.ac.gla.dcs.gms.main.BackPressedListener;
 import uk.ac.gla.dcs.gms.main.GMSMainFragment;
 import uk.ac.gla.dcs.gms.utils.ErrorsUtils;
 import uk.co.senab.photoview.PhotoViewAttacher;
@@ -350,54 +353,77 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
             // the expanded image.
             final float startScaleFinal = startScale;
 
-
             //Back Pressed
-            expandedImageView.setOnKeyListener(new View.OnKeyListener() {
+            BackPressedListener backPressedListener =
+                    new MyBackPressedLister(expandedImageView, mCurrentAnimator,
+                            startBounds, startScaleFinal, mShortAnimationDuration,
+                            thumbView);
+            IntentFilter intentFilter = new IntentFilter(BackPressedListener.BROADCAST_EVENT);
+            context.registerReceiver(backPressedListener, intentFilter);
+
+        }
+    }
+
+    private class MyBackPressedLister extends BackPressedListener {
+
+        private ImageView expandedImageView;
+        private Animator mCurrentAnimator;
+        private Rect startBounds;
+        private float startScaleFinal;
+        private Integer mShortAnimationDuration;
+        private View thumbView;
+
+        public MyBackPressedLister(ImageView imageView, Animator animator, Rect startBounds,
+                                   float startScaleFinal, Integer mShortAnimationDuration,
+                                   View view) {
+            expandedImageView = imageView;
+            mCurrentAnimator = animator;
+            this.startBounds = startBounds;
+            this.startScaleFinal = startScaleFinal;
+            this.mShortAnimationDuration = mShortAnimationDuration;
+            thumbView = view;
+        }
+
+        @Override
+        public boolean onBackPressed() {
+            if (mCurrentAnimator != null) {
+                mCurrentAnimator.cancel();
+            }
+
+            // Animate the four positioning/sizing properties in parallel,
+            // back to their original values.
+            AnimatorSet set = new AnimatorSet();
+            set.play(ObjectAnimator
+                    .ofFloat(expandedImageView, View.X, startBounds.left))
+                    .with(ObjectAnimator
+                            .ofFloat(expandedImageView,
+                                    View.Y, startBounds.top))
+                    .with(ObjectAnimator
+                            .ofFloat(expandedImageView,
+                                    View.SCALE_X, startScaleFinal))
+                    .with(ObjectAnimator
+                            .ofFloat(expandedImageView,
+                                    View.SCALE_Y, startScaleFinal));
+            set.setDuration(mShortAnimationDuration);
+            set.setInterpolator(new DecelerateInterpolator());
+            set.addListener(new AnimatorListenerAdapter() {
                 @Override
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        if (mCurrentAnimator != null) {
-                            mCurrentAnimator.cancel();
-                        }
+                public void onAnimationEnd(Animator animation) {
+                    thumbView.setAlpha(1f);
+                    expandedImageView.setVisibility(View.GONE);
+                    mCurrentAnimator = null;
+                }
 
-                        // Animate the four positioning/sizing properties in parallel,
-                        // back to their original values.
-                        AnimatorSet set = new AnimatorSet();
-                        set.play(ObjectAnimator
-                                .ofFloat(expandedImageView, View.X, startBounds.left))
-                                .with(ObjectAnimator
-                                        .ofFloat(expandedImageView,
-                                                View.Y, startBounds.top))
-                                .with(ObjectAnimator
-                                        .ofFloat(expandedImageView,
-                                                View.SCALE_X, startScaleFinal))
-                                .with(ObjectAnimator
-                                        .ofFloat(expandedImageView,
-                                                View.SCALE_Y, startScaleFinal));
-                        set.setDuration(mShortAnimationDuration);
-                        set.setInterpolator(new DecelerateInterpolator());
-                        set.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                thumbView.setAlpha(1f);
-                                expandedImageView.setVisibility(View.GONE);
-                                mCurrentAnimator = null;
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-                                thumbView.setAlpha(1f);
-                                expandedImageView.setVisibility(View.GONE);
-                                mCurrentAnimator = null;
-                            }
-                        });
-                        set.start();
-                        mCurrentAnimator = set;
-                        return true;
-                    }
-                    return false;
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    thumbView.setAlpha(1f);
+                    expandedImageView.setVisibility(View.GONE);
+                    mCurrentAnimator = null;
                 }
             });
+            set.start();
+            mCurrentAnimator = set;
+            return true;
         }
     }
 }
