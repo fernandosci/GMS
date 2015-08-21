@@ -358,7 +358,7 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
                     new MyBackPressedLister(expandedImageView, mCurrentAnimator,
                             startBounds, startScaleFinal, mShortAnimationDuration,
                             thumbView);
-            IntentFilter intentFilter = new IntentFilter(BackPressedListener.BROADCAST_EVENT);
+            IntentFilter intentFilter = new IntentFilter(BackPressedListener.BACKPRESSEDACTION);
             context.registerReceiver(backPressedListener, intentFilter);
 
         }
