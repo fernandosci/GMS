@@ -20,7 +20,6 @@
             android:id="@+id/lms_daily_summary_expanded_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/bonus_coin"
             android:visibility="invisible"/>
 
     </FrameLayout>
