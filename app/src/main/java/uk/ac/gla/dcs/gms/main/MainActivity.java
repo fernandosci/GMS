@@ -46,6 +46,8 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        savedInstances = new HashMap<>();
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.main_fragment_navigation_drawer);
         mTitle = getTitle();
