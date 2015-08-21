@@ -109,7 +109,8 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
 
         broadcastManager = GMSBroadcastManager.getInstance(context);
 
-        mode = MODE_KEYMOMENTS;
+        Bundle arguments = getArguments();
+        mode = arguments.getInt("MODE");
         begin = Calendar.getInstance();
         begin.setTimeInMillis(0);
         end = Calendar.getInstance();

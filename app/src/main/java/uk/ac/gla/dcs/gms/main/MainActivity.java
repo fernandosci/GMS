@@ -81,15 +81,18 @@ public class MainActivity extends ActionBarActivity
         switch (position) {
             case 0:
                 fragment = LMSDailySummary.newInstance("0", LMSDailySummary.MODE_KEYMOMENTS);
+                ((LMSDailySummary) fragment).setMode(LMSDailySummary.MODE_KEYMOMENTS);
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, fragment)
                         .commit();
                 break;
             case 1:
                 fragment = LMSDailySummary.newInstance("1", LMSDailySummary.MODE_ALLIMAGES);
+                ((LMSDailySummary) fragment).setMode(LMSDailySummary.MODE_ALLIMAGES);
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, fragment)
                         .commit();
+                break;
             case 2:
                 lmsMapFragment = LMSMapFragment.newInstance("2", LMSMapFragment.MODE_HEATMAP);
                 fragmentManager.beginTransaction()
