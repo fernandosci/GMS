@@ -60,8 +60,9 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         btnRegister = (Button) findViewById(R.id.login_btn_register);
         btnLogin = (Button) findViewById(R.id.login_btn);
         progressBar = (ProgressBar) findViewById(R.id.login_pbar);
+        progressBar.setVisibility(View.INVISIBLE);
 
-        imgViewLogo.setImageResource(R.drawable.bonus_coin);
+        imgViewLogo.setImageResource(R.drawable.gms_logo);
 
         btnRegister.setOnClickListener(this);
         btnLogin.setOnClickListener(this);

@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.HashMap;
 import java.util.Random;
 
 import uk.ac.gla.dcs.gms.GMSBroadcastManager;
@@ -37,6 +38,8 @@ public class MainActivity extends ActionBarActivity
 
     private int backpressedId;
     private GMSBroadcastManager bmngr;
+
+    private HashMap<String, Fragment> savedInstances;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

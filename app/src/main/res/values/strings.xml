@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">GMS</string>
 
-    <string name="login_str_description">Description Description Description...</string>
+    <string name="login_str_description"></string>
 
     <string name="title_activity_register">Register</string>
     <string name="register_str_secret_question">Select a secret question</string>
