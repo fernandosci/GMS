@@ -6,17 +6,14 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.util.Pair;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,16 +26,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import uk.ac.gla.dcs.gms.GMSBroadcastManager;
 import uk.ac.gla.dcs.gms.api.GMS;
 import uk.ac.gla.dcs.gms.api.GMSException;
 import uk.ac.gla.dcs.gms.api.http.HTTPProgressStatus;
@@ -55,23 +48,33 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnScrollListener, View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
+    public static final int MODE_KEYMOMENTS = 0;
+    public static final int MODE_ALLIMAGES = 1;
+
+    private Context context;
+    private int mode;
+
     private ListView listView;
     private ProgressBar progressBar;
     private ImageScrollerAdapter adapter;
+    private Button button;
+    private Calendar begin, end;
+
     private Handler mHandler;
     private HashSet<String> imgList;
     private ArrayList<Pair<String, String>> imgViewList;
     private LocalListener localListener;
     private boolean hasCallback;
-    private Context context;
-    private Button button;
-    private Calendar begin, end;
-    private LMSSession lmsSession;
 
-    public static LMSDailySummary newInstance(String section) {
+    private LMSSession lmsSession;
+    private GMSBroadcastManager broadcastManager;
+
+
+    public static LMSDailySummary newInstance(String section, int mode) {
         LMSDailySummary dailySummary = new LMSDailySummary();
         Bundle args = new Bundle();
         args.putString(ARG_SECTION, section);
+        args.putInt("MODE", mode);
         dailySummary.setArguments(args);
         return dailySummary;
     }
@@ -79,13 +82,11 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-
         imgList = new HashSet();
         imgViewList = new ArrayList<>();
         context = inflater.getContext();
 
         View rootView;
-
         rootView = inflater.inflate(R.layout.lms_daily_summary, container, false);
         localListener = new LocalListener(rootView);
 
@@ -99,12 +100,20 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
 
         listView = (ListView) rootView.findViewById(R.id.listView);
         listView.addFooterView(footer);
-
         adapter = new ImageScrollerAdapter(inflater.getContext(), R.layout.row_layout, imgViewList, localListener);
         listView.setAdapter(adapter);
         listView.setOnScrollListener(this); //listen for a scroll movement to the bottom
 
         hasCallback = true;
+
+
+        broadcastManager = GMSBroadcastManager.getInstance(context);
+
+        mode = MODE_KEYMOMENTS;
+        begin = Calendar.getInstance();
+        begin.setTimeInMillis(0);
+        end = Calendar.getInstance();
+
 
         try {
             lmsSession = GMS.getInstance().getLMSSession();
@@ -114,11 +123,7 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
             //todo handle error...
         }
 
-        LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder(context);
-        builder.setLimit(10).setPersonal(true);
-
-
-        lmsSession.getImages(localListener, 0, builder.toString());
+        lmsSession.getImages(localListener, 0, getParamString());
 
         button = (Button) rootView.findViewById(R.id.lms_daily_summary_button);
         button.setOnClickListener(this);
@@ -129,7 +134,7 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
     @Override
     public void onClick(View v) {
         if (v.getId() == button.getId()) {
-            Calendar calendar = Calendar.getInstance();
+            Calendar calendar = end;
             Integer year = calendar.get(Calendar.YEAR);
             Integer month = calendar.get(Calendar.MONTH);
             Integer day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -140,25 +145,16 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder(context);
 
-        begin = Calendar.getInstance();
-        end = Calendar.getInstance();
-
-        begin.set(year, monthOfYear+1, dayOfMonth, 0, 1);
-        end.set(year, monthOfYear+1, dayOfMonth, 23, 59);
+        begin.set(year, monthOfYear, dayOfMonth, 0, 0);
+        end.set(year, monthOfYear, dayOfMonth, 23, 59);
         Log.v("Bruno", Integer.toString(dayOfMonth));
 
         imgList.clear();
         imgViewList.clear();
         adapter.notifyDataSetChanged();
 
-        builder.setLimit(10)
-                .setSkip(imgList.size())
-                .setInterval(begin, end)
-                .setPersonal(true);
-
-        lmsSession.getImages(localListener, 0, builder.toString());
+        lmsSession.getImages(localListener, 0, getParamString());
 
     }
 
@@ -182,6 +178,37 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
             hasCallback = true;
         }
 
+    }
+
+    public void setMode(int mode){
+        if (mode == MODE_ALLIMAGES || mode == MODE_KEYMOMENTS)
+            this.mode = mode;
+    }
+
+    private String getParamString(){
+        LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder(context);
+        int limit = 10;
+
+        if (mode == MODE_KEYMOMENTS) {
+            builder.setLimit(limit)
+                    .setSkip(imgList.size())
+                    .setInterval(begin, end)
+                    .setPersonal(true)
+                    .setKeyMoments();
+        }else if (mode == MODE_ALLIMAGES){
+            builder.setLimit(limit)
+                    .setSkip(imgList.size())
+                    .setInterval(begin, end)
+                    .setPersonal(true)
+                    .setAllImages();
+        }else{
+            //not tested..
+            builder.setLimit(limit)
+                    .setSkip(imgList.size())
+                    .setInterval(begin, end);
+        }
+
+        return builder.toString();
     }
 
     private class LocalListener implements View.OnClickListener, HTTPResponseListener, Runnable {
@@ -253,9 +280,7 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
 
         @Override
         public void run() {
-            LMSImageRequestParamBuilder builder = new LMSImageRequestParamBuilder(context);
-            builder.setLimit(10).setPersonal(true).setSkip(imgList.size());
-            lmsSession.getImages(localListener, 1, builder.toString());
+            lmsSession.getImages(localListener, 1, getParamString());
         }
 
         private void zoomImageFromThumb(final View thumbView, Bitmap bitmap) {
@@ -359,8 +384,9 @@ public class LMSDailySummary extends GMSMainFragment implements AbsListView.OnSc
                             startBounds, startScaleFinal, mShortAnimationDuration,
                             thumbView);
             IntentFilter intentFilter = new IntentFilter(BackPressedListener.BACKPRESSEDACTION);
-            context.registerReceiver(backPressedListener, intentFilter);
 
+
+            broadcastManager.registerReceiver(backPressedListener,intentFilter);
         }
     }
 

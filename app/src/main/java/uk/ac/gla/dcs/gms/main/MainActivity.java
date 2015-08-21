@@ -15,6 +15,7 @@ import android.view.MenuItem;
 
 import java.util.Random;
 
+import uk.ac.gla.dcs.gms.GMSBroadcastManager;
 import uk.ac.gla.dcs.gms.lms.LMSDailySummary;
 import uk.ac.gla.dcs.gms.lms.LMSMapFragment;
 import uk.ac.gla.dcs.gms.lms.R;
@@ -23,21 +24,19 @@ import uk.ac.gla.dcs.gms.lms.R;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, GMSMainFragmentCallbacks {
 
+    public FragmentManager fragmentManager;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-
-    public FragmentManager fragmentManager;
-
     private LocalBroadcastReceiver bReceiver;
 
     private int backpressedId;
+    private GMSBroadcastManager bmngr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +56,9 @@ public class MainActivity extends ActionBarActivity
         bReceiver = new LocalBroadcastReceiver();
         IntentFilter iFilter = new IntentFilter();
         iFilter.addAction(BackPressedListener.BACKPRESSEDRESPONSE);
-        backpressedId=  0;
-        getApplicationContext().registerReceiver(bReceiver,iFilter);
+        backpressedId = 0;
+        bmngr = GMSBroadcastManager.getInstance(getApplicationContext());
+        bmngr.registerReceiver(bReceiver, iFilter);
 
 
         //might remove these lines
@@ -76,28 +76,29 @@ public class MainActivity extends ActionBarActivity
         String[] titles = getResources().getStringArray(R.array.main_titles);
 
         mTitle = titles[position];
+        Fragment fragment;
 
         switch (position) {
             case 0:
-                    Fragment fragment = LMSDailySummary.newInstance("0");
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.container, fragment)
-                                    .commit();
+                fragment = LMSDailySummary.newInstance("0", LMSDailySummary.MODE_KEYMOMENTS);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .commit();
                 break;
-//            case 1:
-//                fragmentManager.beginTransaction()
-//                        .replace(R.id.container, PlaceholderFragment.newInstance(position))
-//                        .commit();
-//                break;
+            case 1:
+                fragment = LMSDailySummary.newInstance("1", LMSDailySummary.MODE_ALLIMAGES);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .commit();
             case 2:
-                lmsMapFragment = LMSMapFragment.newInstance("2",LMSMapFragment.MODE_HEATMAP);
+                lmsMapFragment = LMSMapFragment.newInstance("2", LMSMapFragment.MODE_HEATMAP);
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, lmsMapFragment)
                         .commit();
                 restoreActionBar();
                 break;
             case 3:
-                lmsMapFragment = LMSMapFragment.newInstance("3",LMSMapFragment.MODE_TRAILS);
+                lmsMapFragment = LMSMapFragment.newInstance("3", LMSMapFragment.MODE_TRAILS);
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, lmsMapFragment)
                         .commit();
@@ -136,7 +137,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onSectionAttached(String section) {
         String[] titles = getResources().getStringArray(R.array.main_titles);
-       // mTitle = titles[section];
+        // mTitle = titles[section];
     }
 
     public void restoreActionBar() {
@@ -173,34 +174,36 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(BackPressedListener.BACKPRESSEDACTION);
-        backpressedId = new Random().nextInt();
-        i.putExtra(BackPressedListener.KEY_ID,backpressedId);
-        sendBroadcast(i);
 
+        if (bmngr.getRegisteredActionCount(BackPressedListener.BACKPRESSEDACTION) == 0)
+            super.onBackPressed();
+        else {
+            Intent i = new Intent(BackPressedListener.BACKPRESSEDACTION);
+            backpressedId = new Random().nextInt();
+            i.putExtra(BackPressedListener.KEY_ID, backpressedId);
+            bmngr.sendBroadcast(i);
+        }
     }
 
 
-    private class LocalBroadcastReceiver extends BroadcastReceiver{
-
+    private class LocalBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (intent.getAction().equals(BackPressedListener.BACKPRESSEDRESPONSE)){
+            if (intent.getAction().equals(BackPressedListener.BACKPRESSEDRESPONSE)) {
                 Bundle extras = intent.getExtras();
 
                 int id = extras.getInt(BackPressedListener.KEY_ID);
-                if (id == backpressedId){
+                if (id == backpressedId) {
 
                     boolean backConsumed = extras.getBoolean(BackPressedListener.KEY_CONSUMED);
 
-                    if (!backConsumed){
+                    if (!backConsumed) {
                         MainActivity.super.onBackPressed();
                     }
                 }
             }
-
         }
     }
 }

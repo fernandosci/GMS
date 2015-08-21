@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import uk.ac.gla.dcs.gms.GMSBroadcastManager;
+
 /**
  * Created by ito.
  */
@@ -29,8 +31,9 @@ public abstract class BackPressedListener extends BroadcastReceiver {
         i.putExtra(KEY_ID,anInt);
         i.putExtra(KEY_CONSUMED, result);
 
-        context.unregisterReceiver(this);
-        context.sendBroadcast(i);
+        GMSBroadcastManager broadcastManager = GMSBroadcastManager.getInstance(context);
+        broadcastManager.unregisterReceiver(this);
+        broadcastManager.sendBroadcast(i);
     }
 
     public abstract boolean onBackPressed();
